@@ -1,17 +1,17 @@
 # Журнал экспериментов Практики 2
 
-- Выбранный слабый артефакт Практики 1:
-- Что в нём нужно улучшить:
-- Как поймём, что изменение полезно:
+- Выбранный слабый артефакт Практики 1: [`tests_load.md`](../practice_01/tests_load.md).
+- Что в нём нужно улучшить: исходная версия использовала неопределённые `N` и `T`, не задавала воспроизводимого порядка запуска, не отделяла требования от исследовательских метрик и покрывала только OUT-1 и API-1.
+- Как поймём, что изменение полезно: после задания внешних параметров другой инженер сможет повторить каждый сценарий; у каждого обязательного критерия будет evidence; неподтверждённые RPS, длительность, latency и error-rate останутся явно неизвестными; документ не будет выдавать план за выполненный прогон.
 
 | Техника | Файл эксперимента | Изменённый файл Практики 1 | Конкретное изменение | Проверка | Что отклонили |
 |---|---|---|---|---|---|
-| Few-shot | [`few_shot/experiment.md`](few_shot/experiment.md) |  |  |  |  |
-| R.C.T.F. | [`rctf/experiment.md`](rctf/experiment.md) |  |  |  |  |
-| Chain of Verification | [`chain_of_verification/experiment.md`](chain_of_verification/experiment.md) |  |  |  |  |
-| Tree of Thoughts | [`tree_of_thoughts/experiment.md`](tree_of_thoughts/experiment.md) |  |  |  |  |
-| RAG | [`rag/experiment.md`](rag/experiment.md) |  |  |  |  |
-| ReAct | [`react/experiment.md`](react/experiment.md) |  |  |  |  |
+| Few-shot | [`few_shot/experiment.md`](few_shot/experiment.md) | [`tests_e2e.md`, таблица E2E-проверок](../practice_01/tests_e2e.md#e2e-проверки) | Три общие строки заменены двенадцатью атомарными сценариями с точными входами, действиями, результатами и evidence для семи правил | Каждая строка сопоставлена с хорошим примером; неизвестный контракт REL-1 помечен явно | Расплывчатые «позитивный/негативный», выдуманные HTTP-коды, заявления о выполненных тестах |
+| R.C.T.F. | [`rctf/experiment.md`](rctf/experiment.md) | [`tests_load.md`, таблица и разделы запуска](../practice_01/tests_load.md#нагрузочные-проверки) | Добавлены профили API-1, REL-1, SEC-1, OBS-1, ступенчатое исследование, параметры, порядок, остановка и неизвестные | Числа сверены с `CASE.md`; неизвестные SLO не получили произвольных значений | Выдуманные RPS, длительность, latency/error-rate SLO и результаты прогонов |
+| Chain of Verification | [`chain_of_verification/experiment.md`](chain_of_verification/experiment.md) | [`tests_unit.md`, таблица Unit-проверок](../practice_01/tests_unit.md#unit-проверки) | Убраны предположения о функции нормализации; сформировано 17 атомарных строк для OUT-1, QA-1, SEC-1, API-1, REL-1, SCOPE-1, OBS-1 | Повторно проверены 10 вопросов; все семь правил покрыты, неизвестные реализации отмечены | Имена несуществующих функций, тип исключения, неподтверждённый контракт ошибки |
+| Tree of Thoughts | [`tree_of_thoughts/experiment.md`](tree_of_thoughts/experiment.md) | [`analysis.md`, AS IS / TO BE и Разница](../practice_01/analysis.md#анализ-процесса-as-is-и-to-be) | Из трёх нотаций выбрана DFD-подобная Mermaid-модель; заполнены AS IS, TO BE, ограничения и шесть проверяемых различий | Узлы AS IS сверены с `TRAINING_PR.diff`, TO BE — с идентификаторами `CASE.md`; Mermaid синтаксически присутствует | BPMN с неподтверждёнными ролями, IDEF0 с выдуманными механизмами, очереди/БД/gateway |
+| RAG | [`rag/experiment.md`](rag/experiment.md) | [`tests_integration.md`, таблица Integration-проверок](../practice_01/tests_integration.md#integration-проверки) | По четырём разрешённым источникам добавлены 12 сценариев реальных границ API, ReviewService и LLM; текущий `comment` отмечен как разрыв OUT-1 | Каждая связь подтверждена `TRAINING_PR.diff`, ожидание — `CASE.md`, неизвестное — `context.md` | Отдельная «Нормализация», middleware, gateway, GitHub-клиент, ретраи и фиктивные результаты |
+| ReAct | [`react/experiment.md`](react/experiment.md) | [`project_management.md`, план и контрольные точки](../practice_01/project_management.md#план-поставки) | За шесть наблюдаемых шагов фиктивные даты и общие проверки заменены пятью зависимыми инкрементами, реальными make-targets и условиями остановки | Прочитаны три Makefile; выполнены `make step1` и `make step2`; проверены ссылки и diff | Придуманные сроки, персональные владельцы и несуществующие функциональные тесты |
 
 ## Независимое ревью
 
