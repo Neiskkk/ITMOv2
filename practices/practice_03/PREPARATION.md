@@ -27,8 +27,8 @@
 ```bash
 ollama --version
 opencode --version
-ollama pull qwen3.5:4b
-ollama run qwen3.5:4b "Объясни разницу между моделью и сервером двумя предложениями"
+ollama pull qwen3.5:2b
+ollama run qwen3.5:2b "Объясни разницу между моделью и сервером двумя предложениями"
 ```
 
 Если выбрали меньшую модель, поручите OpenCode согласованно заменить тег в командах и `FROM` в обоих Modelfile.
@@ -37,7 +37,7 @@ ollama run qwen3.5:4b "Объясни разницу между моделью �
 ```bash
 curl --fail http://localhost:11434/api/tags
 ollama list
-ollama show qwen3.5:4b
+ollama show qwen3.5:2b
 ```
 
 Сервер обычно запускает приложение Ollama. Если он не запущен, попросите OpenCode запустить `ollama serve` отдельным процессом. Не запускайте второй сервер на занятом порту.
