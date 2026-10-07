@@ -212,10 +212,182 @@ function initializeCatalog() {
   });
 }
 
+// ===== Feature 2: Application form =====
+
+function getFormElements() {
+  const form = document.querySelector("#application-form");
+  return {
+    form,
+    pet: form.querySelector("#pet-select"),
+    name: form.querySelector("#applicant-name"),
+    phone: form.querySelector("#applicant-phone"),
+    email: form.querySelector("#applicant-email"),
+    comment: form.querySelector("#applicant-comment"),
+    consent: form.querySelector("#applicant-consent"),
+  };
+}
+
+function fieldErrorElement(field) {
+  const describedBy = field.getAttribute("aria-describedby");
+  return describedBy ? document.getElementById(describedBy) : null;
+}
+
+function showFieldError(field, message) {
+  const errorEl = fieldErrorElement(field);
+  if (errorEl) {
+    errorEl.textContent = message;
+  }
+  field.setAttribute("aria-invalid", "true");
+}
+
+function clearFieldError(field) {
+  const errorEl = fieldErrorElement(field);
+  if (errorEl) {
+    errorEl.textContent = "";
+  }
+  field.removeAttribute("aria-invalid");
+}
+
+function validateEmail(value) {
+  // Very basic email validation
+  const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/i;
+  return emailRe.test(value);
+}
+
+function validatePhone(value) {
+  const digits = (value.match(/\d/g) || []).length;
+  // Allowed chars are checked by replace; ensure only valid characters
+  const cleaned = value.replace(/[\d\s+\-()]/g, "");
+  const hasOnlyAllowed = cleaned.length === 0;
+  return hasOnlyAllowed && digits >= 10;
+}
+
+function validateApplication(formData) {
+  const errors = {};
+
+  // pet: required and must exist in animals
+  const pet = (formData.pet || "").trim();
+  if (!pet) {
+    errors.pet = "Пожалуйста, выберите питомца";
+  } else if (!animals.some((a) => a.id === pet)) {
+    errors.pet = "Выбран неверный питомец";
+  }
+
+  // name: 2..60 after trim
+  const name = (formData.name || "").trim();
+  if (!name) {
+    errors.name = "Введите имя";
+  } else if (name.length < 2 || name.length > 60) {
+    errors.name = "Имя должно быть от 2 до 60 символов";
+  }
+
+  const phone = (formData.phone || "").trim();
+  const email = (formData.email || "").trim();
+
+  if (!phone && !email) {
+    errors.phone = "Укажите телефон или email";
+    errors.email = "Укажите телефон или email";
+  } else {
+    if (phone) {
+      if (!validatePhone(phone)) {
+        errors.phone = "Проверьте номер телефона (не менее 10 цифр)";
+      }
+    }
+    if (email) {
+      if (!validateEmail(email)) {
+        errors.email = "Некорректный email";
+      }
+    }
+  }
+
+  const comment = (formData.comment || "").trim();
+  if (comment.length > 500) {
+    errors.comment = "Комментарий не должен превышать 500 символов";
+  }
+
+  if (!formData.consent) {
+    errors.consent = "Поставьте галочку согласия";
+  }
+
+  return errors;
+}
+
+function handleApplicationSubmit(event) {
+  event.preventDefault();
+  const { form, pet, name, phone, email, comment, consent } = getFormElements();
+
+  // Clear previous errors
+  [pet, name, phone, email, comment, consent].forEach(clearFieldError);
+
+  const formData = {
+    pet: pet.value,
+    name: name.value,
+    phone: phone.value,
+    email: email.value,
+    comment: comment.value,
+    consent: consent.checked,
+  };
+
+  const errors = validateApplication(formData);
+
+  // Additional native + JS email validation (Constraint Validation API + custom)
+  if (formData.email.trim()) {
+    if (email.validity.typeMismatch || !validateEmail(formData.email)) {
+      errors.email = "Некорректный email";
+    }
+  }
+
+  const firstInvalid = [];
+  Object.entries(errors).forEach(([key, message]) => {
+    const field = ({ pet, name, phone, email, comment, consent })[key];
+    if (field) {
+      showFieldError(field, message);
+      firstInvalid.push(field);
+    }
+  });
+
+  if (firstInvalid.length > 0) {
+    firstInvalid[0].focus();
+    return;
+  }
+
+  // success: no network request
+  const status = document.querySelector("#application-status");
+  status.textContent = "Заявка принята. Мы свяжемся с вами";
+
+  // clear personal fields, keep selected pet
+  name.value = "";
+  phone.value = "";
+  email.value = "";
+  comment.value = "";
+  consent.checked = false;
+
+  // move focus to status for feedback, then back to name for convenience
+  status.focus?.();
+}
+
+function initializeApplicationForm() {
+  const { form, name, phone, email, comment, consent, pet } = getFormElements();
+  if (!form) return;
+
+  form.addEventListener("submit", handleApplicationSubmit);
+
+  // Clear field error on input/change
+  [name, phone, email, comment].forEach((el) => {
+    el.addEventListener("input", () => clearFieldError(el));
+  });
+  [pet, consent].forEach((el) => {
+    el.addEventListener("change", () => clearFieldError(el));
+  });
+}
+
 if (typeof document !== "undefined") {
-  document.addEventListener("DOMContentLoaded", initializeCatalog);
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeCatalog();
+    initializeApplicationForm();
+  });
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { animals, filterAnimals };
+  module.exports = { animals, filterAnimals, validateApplication, validateEmail, validatePhone };
 }

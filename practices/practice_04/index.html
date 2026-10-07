@@ -67,17 +67,39 @@
         <h2 id="application-title">Начнём знакомство</h2>
         <p id="application-status" role="status" aria-live="polite">Выберите питомца в каталоге — его имя появится здесь.</p>
       </div>
-      <form class="application-preview" aria-label="Черновик заявки">
+      <form class="application-preview" id="application-form" aria-label="Заявка на знакомство" novalidate>
         <div class="field">
           <label for="pet-select">Выбранный питомец</label>
-          <select id="pet-select" name="pet" aria-describedby="feature-note"><option value="">Питомец пока не выбран</option></select>
+          <select id="pet-select" name="pet" aria-describedby="pet-error"><option value="">Питомец пока не выбран</option></select>
+          <p class="field-error" id="pet-error" aria-live="polite"></p>
         </div>
         <div class="field">
           <label for="applicant-name">Как к вам обращаться?</label>
-          <input id="applicant-name" name="name" type="text" autocomplete="name" placeholder="Ваше имя">
+          <input id="applicant-name" name="name" type="text" autocomplete="name" placeholder="Ваше имя" aria-describedby="name-error">
+          <p class="field-error" id="name-error" aria-live="polite"></p>
         </div>
-        <button class="disabled-action" type="button" disabled>Отправить заявку</button>
-        <p class="feature-note" id="feature-note">Заполнение и проверка заявки появятся во второй фиче.</p>
+        <div class="field">
+          <label for="applicant-phone">Телефон</label>
+          <input id="applicant-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Например: +7 (999) 123-45-67" aria-describedby="phone-error">
+          <p class="field-error" id="phone-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-email">Email</label>
+          <input id="applicant-email" name="email" type="email" autocomplete="email" placeholder="name@example.org" aria-describedby="email-error">
+          <p class="field-error" id="email-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-comment">Комментарий (необязательно)</label>
+          <textarea id="applicant-comment" name="comment" rows="4" maxlength="500" placeholder="Коротко расскажите о себе и ожиданиях" aria-describedby="comment-error"></textarea>
+          <p class="field-error" id="comment-error" aria-live="polite"></p>
+        </div>
+        <div class="field field-consent">
+          <label>
+            <input id="applicant-consent" name="consent" type="checkbox" aria-describedby="consent-error"> Даю согласие на обработку данных (учебный проект)
+          </label>
+          <p class="field-error" id="consent-error" aria-live="polite"></p>
+        </div>
+        <button class="primary-action" type="submit">Отправить заявку</button>
       </form>
     </section>
 
