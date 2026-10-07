@@ -1,0 +1,44 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/itmo-agent",
+  "providers": {
+    "ollama": {
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "body": {
+        "think": false
+      },
+      "models": {
+        "itmo-agent": {
+          "modelID": "itmo-agent:latest",
+          "name": "ITMO local 64k",
+          "capabilities": {
+            "tools": true,
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    }
+  },
+  "agents": {
+    "homework-guide": {
+      "description": "Read-only local repository assistant for homework",
+      "mode": "primary",
+      "steps": 6,
+      "system": "Ты помощник по проекту. Кратко ответь на вопрос.",
+      "permissions": [
+        { "action": "*", "resource": "*", "effect": "deny" },
+        { "action": "read", "resource": "*", "effect": "allow" },
+        { "action": "glob", "resource": "*", "effect": "allow" },
+        { "action": "grep", "resource": "*", "effect": "allow" }
+      ]
+    }
+  }
+}
