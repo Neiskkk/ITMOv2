@@ -30,6 +30,13 @@
         "@playwright/mcp@latest",
         "--isolated"
       ]
+    },
+    "shelter-tools": {
+      "type": "local",
+      "command": [
+        "node",
+        "practices/practice_04/mcp/shelter-tools/server.js"
+      ]
     }
   }
 }

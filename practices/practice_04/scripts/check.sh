@@ -12,7 +12,7 @@ echo "[check] Running static checks for practice_04"
 
 # 1) Required files
 missing=()
-for f in index.html styles.css script.js; do
+for f in index.html styles.css script.js mcp/shelter-tools/server.js mcp/shelter-tools/package.json; do
   if [[ ! -f "$f" ]]; then
     missing+=("$f")
   fi
@@ -34,6 +34,13 @@ else
     echo "[check] JS syntax OK (node --check)"
   else
     err "node --check reported syntax errors in script.js"
+    pass=false
+  fi
+
+  if node --check mcp/shelter-tools/server.js >/dev/null 2>&1; then
+    echo "[check] MCP server syntax OK (node --check)"
+  else
+    err "node --check reported syntax errors in mcp/shelter-tools/server.js"
     pass=false
   fi
 fi
