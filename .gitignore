@@ -166,6 +166,7 @@ student_solutions/
 *.tmp
 *.temp
 ~$*.pptx
+.playwright-mcp/
 
 # Папки с точкой (исключая необходимые)
 !.github/

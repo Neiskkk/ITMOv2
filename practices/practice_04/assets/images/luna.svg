@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" role="img" aria-label="Луна">
+  <rect width="640" height="480" fill="#bfd0c0"/>
+  <circle cx="92" cy="86" r="44" fill="#3159d8" opacity=".75"/>
+  <circle cx="560" cy="390" r="92" fill="#fff" opacity=".32"/>
+  <path d="M190 160 235 70l65 85M450 160 405 70l-65 85" fill="#8d9da0" stroke="#18362f" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="320" cy="255" rx="150" ry="145" fill="#8d9da0" stroke="#18362f" stroke-width="12"/>
+  <ellipse cx="265" cy="245" rx="14" ry="19" fill="#18362f"/>
+  <ellipse cx="375" cy="245" rx="14" ry="19" fill="#18362f"/>
+  <path d="M305 285h30l-15 16z" fill="#3159d8" stroke="#18362f" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M320 302c-4 23-29 28-47 15M320 302c4 23 29 28 47 15" fill="none" stroke="#18362f" stroke-width="8" stroke-linecap="round"/>
+  <text x="32" y="438" fill="#18362f" font-family="Arial, sans-serif" font-size="34" font-weight="700">Луна</text>
+</svg>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Лапа помощи — учебный лендинг приюта для животных">
+  <title>Лапа помощи — приют для животных</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/peach.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+  <header class="site-header">
+    <a class="brand" href="#hero" aria-label="Лапа помощи — на главную">
+      <span class="brand-mark" aria-hidden="true">ЛП</span><span>Лапа помощи</span>
+    </a>
+    <nav aria-label="Основная навигация">
+      <a href="#about">О приюте</a><a href="#pets">Питомцы</a><a href="#help">Как помочь</a>
+      <a class="nav-cta" href="#pets">Выбрать питомца</a>
+    </nav>
+  </header>
+  <main id="main-content">
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="hero-context">Учебный городской приют</p>
+        <h1 id="hero-title">Дом начинается с одной встречи</h1>
+        <p class="hero-lead">Познакомьтесь с кошками и собаками, которые готовы стать частью семьи.</p>
+        <a class="primary-action" href="#pets">Смотреть питомцев</a>
+      </div>
+      <div class="hero-poster" aria-hidden="true">
+        <span class="poster-count">6</span><p>характеров,<br>которые стоит<br>узнать лично</p><span class="poster-shape"></span>
+      </div>
+    </section>
+
+    <section class="about content-section" id="about" aria-labelledby="about-title">
+      <div class="section-heading"><h2 id="about-title">Сначала знакомство. Потом решение.</h2></div>
+      <div class="section-copy">
+        <p>Мы собрали короткие и честные рассказы о питомцах. Выберите того, чей характер вам близок, а затем договоритесь о встрече.</p>
+        <p>Все имена и истории на странице демонстрационные — это учебный проект.</p>
+      </div>
+    </section>
+
+    <section class="pets-section" id="pets" aria-labelledby="pets-title">
+      <div class="pets-heading">
+        <div><h2 id="pets-title">Кого вы хотите встретить?</h2><p>Выберите вид животного или посмотрите весь каталог.</p></div>
+        <div class="filter-group" role="group" aria-label="Фильтр питомцев">
+          <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Все <span data-count="all">0</span></button>
+          <button class="filter-button" type="button" data-filter="cat" aria-pressed="false">Кошки <span data-count="cat">0</span></button>
+          <button class="filter-button" type="button" data-filter="dog" aria-pressed="false">Собаки <span data-count="dog">0</span></button>
+        </div>
+      </div>
+      <div class="animal-grid" id="animal-list" aria-live="polite"></div>
+      <p class="empty-state" id="empty-state" hidden>По выбранному фильтру питомцев пока нет</p>
+    </section>
+
+    <section class="help content-section" id="help" aria-labelledby="help-title">
+      <div class="section-heading"><h2 id="help-title">Помочь можно уже сегодня</h2></div>
+      <ul class="help-list">
+        <li><strong>Приехать</strong><span>погулять и познакомиться</span></li>
+        <li><strong>Рассказать</strong><span>поделиться карточкой питомца</span></li>
+        <li><strong>Поддержать</strong><span>привезти корм или лекарства</span></li>
+      </ul>
+    </section>
+
+    <section class="application" id="application" aria-labelledby="application-title" tabindex="-1">
+      <div class="application-copy">
+        <h2 id="application-title">Начнём знакомство</h2>
+        <p id="application-status" role="status" aria-live="polite">Выберите питомца в каталоге — его имя появится здесь.</p>
+      </div>
+      <form class="application-preview" id="application-form" aria-label="Заявка на знакомство" novalidate>
+        <div class="field">
+          <label for="pet-select">Выбранный питомец</label>
+          <select id="pet-select" name="pet" aria-describedby="pet-error"><option value="">Питомец пока не выбран</option></select>
+          <p class="field-error" id="pet-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-name">Как к вам обращаться?</label>
+          <input id="applicant-name" name="name" type="text" autocomplete="name" placeholder="Ваше имя" aria-describedby="name-error">
+          <p class="field-error" id="name-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-phone">Телефон</label>
+          <input id="applicant-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Например: +7 (999) 123-45-67" aria-describedby="phone-error">
+          <p class="field-error" id="phone-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-email">Email</label>
+          <input id="applicant-email" name="email" type="email" autocomplete="email" placeholder="name@example.org" aria-describedby="email-error">
+          <p class="field-error" id="email-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="applicant-comment">Комментарий (необязательно)</label>
+          <textarea id="applicant-comment" name="comment" rows="4" maxlength="500" placeholder="Коротко расскажите о себе и ожиданиях" aria-describedby="comment-error"></textarea>
+          <p class="field-error" id="comment-error" aria-live="polite"></p>
+        </div>
+        <div class="field field-consent">
+          <label>
+            <input id="applicant-consent" name="consent" type="checkbox" aria-describedby="consent-error"> Даю согласие на обработку данных (учебный проект)
+          </label>
+          <p class="field-error" id="consent-error" aria-live="polite"></p>
+        </div>
+        <button class="primary-action" type="submit">Отправить заявку</button>
+      </form>
+    </section>
+
+    <section class="contacts content-section" id="contacts" aria-labelledby="contacts-title">
+      <div class="section-heading"><h2 id="contacts-title">Приходите знакомиться</h2></div>
+      <div class="section-copy"><p>Это учебный проект, поэтому реального адреса и телефона здесь нет.</p><a href="#pets">Вернуться к питомцам</a></div>
+    </section>
+  </main>
+  <footer class="site-footer"><strong>Лапа помощи</strong><span>Учебный лендинг · 2026</span></footer>
+</body>
+</html>

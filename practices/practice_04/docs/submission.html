@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Практика 4 — отчёт</title>
+  <style>
+    :root {
+      --paper: #f4f1e8;
+      --ink: #16382f;
+      --blue: #3159d8;
+      --yellow: #f2c94c;
+      --white: #ffffff;
+      --muted: #5b6d67;
+      --line: rgba(22, 56, 47, 0.22);
+      --ready: #17653b;
+      --todo: #8a4b08;
+      --shadow: 6px 6px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: var(--blue); text-underline-offset: 0.2rem; }
+
+    code {
+      padding: 0.12rem 0.35rem;
+      border-radius: 0.3rem;
+      background: rgba(49, 89, 216, 0.1);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      overflow-x: auto;
+      padding: 0.8rem 1rem;
+      border-bottom: 2px solid var(--ink);
+      background: var(--white);
+    }
+
+    .topbar a {
+      flex: 0 0 auto;
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .slide {
+      min-height: 100vh;
+      display: grid;
+      align-content: center;
+      min-width: 0;
+      padding: clamp(3rem, 8vw, 7rem) clamp(1rem, 7vw, 7rem);
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .slide > * { min-width: 0; }
+
+    .slide:nth-of-type(even) { background: var(--white); }
+
+    .eyebrow {
+      margin: 0 0 0.8rem;
+      color: var(--blue);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.05; }
+    h1 { max-width: 900px; margin: 0; font-size: clamp(3rem, 9vw, 7.5rem); }
+    h2 { margin: 0 0 2rem; font-size: clamp(2.2rem, 6vw, 5rem); }
+    h3 { margin-top: 0; font-size: 1.25rem; }
+
+    .lead {
+      max-width: 820px;
+      margin-top: 1.5rem;
+      font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .card {
+      min-width: 0;
+      padding: 1.25rem;
+      border: 2px solid var(--ink);
+      border-radius: 0.8rem;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .status {
+      display: inline-block;
+      margin-bottom: 0.8rem;
+      padding: 0.22rem 0.6rem;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .ready { color: var(--ready); }
+    .todo { color: var(--todo); }
+
+    .evidence-list li { margin-bottom: 0.7rem; }
+
+    .result {
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 1rem;
+      border-left: 0.55rem solid var(--ready);
+      background: rgba(23, 101, 59, 0.09);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    .placeholder {
+      padding: 1rem;
+      border: 2px dashed var(--todo);
+      background: rgba(242, 201, 76, 0.16);
+    }
+
+    .open-note {
+      max-width: 900px;
+      margin-top: 2rem;
+      padding: 1rem 1.15rem;
+      border: 2px solid var(--ink);
+      border-radius: 0.7rem;
+      background: var(--yellow);
+    }
+
+    .open-note code {
+      display: inline-block;
+      max-width: 100%;
+      margin-block: 0.2rem;
+      background: var(--white);
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .file-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .file-links a {
+      display: inline-block;
+      padding: 0.6rem 0.8rem;
+      border: 2px solid var(--ink);
+      border-radius: 0.5rem;
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .source-dialog {
+      width: min(1000px, calc(100vw - 2rem));
+      max-height: calc(100vh - 2rem);
+      padding: 0;
+      border: 3px solid var(--ink);
+      border-radius: 0.8rem;
+      color: var(--ink);
+      background: var(--white);
+      box-shadow: 10px 10px 0 var(--ink);
+    }
+
+    .source-dialog::backdrop { background: rgba(22, 56, 47, 0.72); }
+
+    .source-dialog__header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 2px solid var(--ink);
+      background: var(--yellow);
+    }
+
+    .source-dialog__header h2 {
+      margin: 0;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+    }
+
+    .source-dialog__close {
+      min-height: 44px;
+      padding: 0.55rem 0.8rem;
+      border: 2px solid var(--ink);
+      border-radius: 0.45rem;
+      color: var(--white);
+      background: var(--ink);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .source-dialog__body { padding: 1rem; }
+
+    .source-dialog__status { margin-top: 0; color: var(--muted); }
+
+    .source-dialog pre {
+      max-height: 62vh;
+      margin: 0;
+      overflow: auto;
+      padding: 1rem;
+      border: 2px solid var(--line);
+      border-radius: 0.5rem;
+      background: #f7f8f6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .source-dialog__fallback { margin: 1rem 0 0; }
+
+    .evidence-figure {
+      margin: 1.5rem 0 0;
+    }
+
+    .evidence-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 2px solid var(--ink);
+      border-radius: 0.65rem;
+      background: #0f1115;
+    }
+
+    .evidence-figure figcaption {
+      margin-top: 0.65rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media print {
+      .topbar { display: none; }
+      .slide { min-height: auto; break-after: page; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="Разделы отчёта">
+    <a href="#summary">Итог</a>
+    <a href="#environment">Среда</a>
+    <a href="#skill">Skill</a>
+    <a href="#mcp">MCP</a>
+    <a href="#hook">Hook</a>
+    <a href="#features">Фичи</a>
+    <a href="#reflection">Рефлексия</a>
+  </nav>
+
+  <main>
+    <section class="slide" id="summary">
+      <p class="eyebrow">Практика 4</p>
+      <h1>Две фичи с агентом</h1>
+      <p class="lead">Лендинг приюта «Лапа помощи»: правила проекта, frontend-design skill, MCP, автоматическая проверка, worktree и отдельное review.</p>
+      <aside class="open-note">
+        <strong>Как открыть отчёт со всеми ссылками:</strong><br>
+        из корня репозитория запустить <code>python3 -m http.server 8000</code>, затем открыть
+        <code>http://localhost:8000/practices/practice_04/docs/submission.html</code>.
+        Кнопки с подтверждениями показывают содержимое локальных исходников прямо внутри отчёта.
+      </aside>
+    </section>
+
+    <section class="slide" id="environment">
+      <p class="eyebrow">Критерий 1</p>
+      <h2>Настроенная среда</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Правила</h3>
+          <p>OpenCode читал технические ограничения до реализации. Новая сессия восстановила контекст по AGENTS и HANDOFF.</p>
+          <p><a class="source-link" href="/practices/practice_04/AGENTS.md" data-source="/practices/practice_04/AGENTS.md" data-title="AGENTS.md">Показать AGENTS.md</a></p>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Runner и hook</h3>
+          <p>Runner запускает статическую проверку, hook возвращает результат агенту после изменения файла.</p>
+          <p><a class="source-link" href="/practices/practice_04/scripts/check.sh" data-source="/practices/practice_04/scripts/check.sh" data-title="scripts/check.sh">Показать check.sh</a></p>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>MCP</h3>
+          <p>Playwright MCP выполнил реальный браузерный сценарий: переход на страницу, фильтрацию каталога, выбор питомца и проверку консоли.</p>
+          <p><a class="source-link" href="/opencode.json" data-source="/opencode.json" data-title="opencode.json">Показать конфигурацию</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="slide" id="skill">
+      <p class="eyebrow">Критерий 2</p>
+      <h2>Skill frontend-design</h2>
+      <span class="status ready">Готово</span>
+      <p>Skill выбран для проектирования выразительного интерфейса без шаблонного вида. При работе над Feature 1 агент использовал его рекомендации для системы цветовых токенов, типографики, сетки и состояний элементов.</p>
+      <ul class="file-links">
+        <li><a class="source-link" href="/practices/practice_04/.opencode/skills/frontend-design/SKILL.md" data-source="/practices/practice_04/.opencode/skills/frontend-design/SKILL.md" data-title="frontend-design/SKILL.md">Показать SKILL.md</a></li>
+        <li><a class="source-link" href="/practices/practice_04/STYLE_GUIDE.md" data-source="/practices/practice_04/STYLE_GUIDE.md" data-title="STYLE_GUIDE.md">Показать STYLE_GUIDE.md</a></li>
+      </ul>
+      <div class="placeholder">
+        Разбор сохранён отдельно и связан с проверенным результатом реализации Feature 1.
+        <a class="source-link" href="/practices/practice_04/docs/SKILL_REVIEW.md" data-source="/practices/practice_04/docs/SKILL_REVIEW.md" data-title="docs/SKILL_REVIEW.md">Показать разбор skill</a>
+      </div>
+    </section>
+
+    <section class="slide" id="mcp">
+      <p class="eyebrow">Критерий 3</p>
+      <h2>MCP: готовый и собственный</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Playwright MCP</h3>
+          <p>Инструмент выбран для проверки пользовательского сценария в настоящем браузере. Вызваны <code>browser_navigate</code>, <code>browser_resize</code>, <code>browser_evaluate</code>, <code>browser_click</code>, <code>browser_console_messages</code> и <code>browser_close</code>.</p>
+          <p>Подтверждено: на старте видны 6 карточек, фильтр «Кошки» оставляет 3 карточки, кнопка «Познакомиться» подставляет Бусю в форму. После подключения локального favicon повторная проверка показала 0 сообщений консоли уровня error.</p>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Собственный MCP</h3>
+          <p>Локальный stdio-сервер <code>shelter-tools</code> реализован на официальном MCP SDK. Tool <code>validate_application</code> проверяет данные заявки по требованиям Feature 2.</p>
+          <p>Успешный вызов с заявкой на Бусю вернул <code>valid: true</code>. Ошибочный вызов вернул <code>valid: false</code> и сообщения по полям <code>animalId</code>, <code>name</code>, <code>phone</code>, <code>email</code> и <code>consent</code>.</p>
+          <ul class="file-links">
+            <li><a class="source-link" href="/practices/practice_04/mcp/shelter-tools/server.js" data-source="/practices/practice_04/mcp/shelter-tools/server.js" data-title="shelter-tools/server.js">Показать MCP server</a></li>
+            <li><a class="source-link" href="/practices/practice_04/mcp/shelter-tools/README.md" data-source="/practices/practice_04/mcp/shelter-tools/README.md" data-title="shelter-tools/README.md">Показать описание</a></li>
+          </ul>
+        </article>
+      </div>
+      <figure class="evidence-figure">
+        <img src="evidence/playwright-console.png" alt="Вывод OpenCode с вызовами Playwright MCP и результатом: ошибок консоли нет">
+        <figcaption>Подтверждение реального вызова Playwright MCP: navigate, console messages и close; ошибок уровня error — 0.</figcaption>
+      </figure>
+      <div class="grid">
+        <figure class="evidence-figure">
+          <img src="evidence/custom-mcp-inputs.png" alt="Корректные и ошибочные входные данные для двух вызовов собственного MCP">
+          <figcaption>Два отдельных входа: корректная и ошибочная заявка.</figcaption>
+        </figure>
+        <figure class="evidence-figure">
+          <img src="evidence/custom-mcp-results.png" alt="Успешный и ошибочный результаты tool validate_application">
+          <figcaption>Фактические результаты собственного MCP: <code>valid: true</code> и <code>valid: false</code> с ошибками по полям.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide" id="hook">
+      <p class="eyebrow">Автоматическая проверка</p>
+      <h2>Hook показал FAIL и PASS</h2>
+      <ol class="evidence-list">
+        <li>Во временной правке создана синтаксическая ошибка в <code>script.js</code>.</li>
+        <li>Hook автоматически запустил доверенный runner и вернул <code>FAIL</code>.</li>
+        <li>После удаления временной строки hook повторил проверку и вернул <code>PASS</code>.</li>
+        <li>Временная ошибка не вошла в итоговый код.</li>
+      </ol>
+      <div class="result">[check] Required files present
+[check] JS syntax OK (node --check)
+PASS</div>
+      <p><a class="source-link" href="/.opencode/plugins/check-after-edit.js" data-source="/.opencode/plugins/check-after-edit.js" data-title="check-after-edit.js">Показать hook</a></p>
+    </section>
+
+    <section class="slide" id="features">
+      <p class="eyebrow">Результат разработки</p>
+      <h2>Feature 1 и Feature 2</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Feature 1</h3>
+          <p>Каталог из шести животных, фильтры по виду и передача выбранного питомца в форму.</p>
+          <code>ebb74c5</code>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Feature 2</h3>
+          <p>Доступная форма заявки, клиентская валидация, успешная отправка без сети.</p>
+          <code>24223c7</code>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Worktree и review</h3>
+          <p>Feature 2 сделана в отдельном worktree. Review через @explore нашло две проблемы, после исправления повторная проверка прошла без замечаний.</p>
+        </article>
+        <article class="card">
+          <span class="status ready">Готово</span>
+          <h3>Handoff</h3>
+          <p>Новая сессия восстановила состояние проекта и самостоятельно получила PASS.</p>
+          <p><a class="source-link" href="/practices/practice_04/docs/HANDOFF.md" data-source="/practices/practice_04/docs/HANDOFF.md" data-title="docs/HANDOFF.md">Показать HANDOFF.md</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="slide" id="reflection">
+      <p class="eyebrow">Критерий 4</p>
+      <h2>Свободная рефлексия</h2>
+      <span class="status ready">Готово</span>
+      <p>В рефлексии зафиксировано, как правила помогли удержать границы проекта, почему потребовалось ручное вмешательство при настройке hook и как worktree с отдельным review помог принять Feature 2. Отдельный вывод касается MCP: статус подключения не заменяет реальный вызов и проверенный результат.</p>
+      <p><a class="source-link" href="/practices/practice_04/reflection.md" data-source="/practices/practice_04/reflection.md" data-title="reflection.md">Показать reflection.md</a></p>
+      <h3>Итоговая проверка</h3>
+      <div class="result">bash practices/practice_04/scripts/check.sh
+git diff --check
+git status --short</div>
+    </section>
+  </main>
+
+  <dialog class="source-dialog" id="source-dialog" aria-labelledby="source-dialog-title">
+    <header class="source-dialog__header">
+      <h2 id="source-dialog-title">Исходный файл</h2>
+      <form method="dialog">
+        <button class="source-dialog__close" type="submit">Закрыть</button>
+      </form>
+    </header>
+    <div class="source-dialog__body">
+      <p class="source-dialog__status" id="source-dialog-status" role="status">Загрузка…</p>
+      <pre><code id="source-dialog-content"></code></pre>
+      <p class="source-dialog__fallback"><a id="source-dialog-link" href="#">Открыть файл в VS Code</a></p>
+    </div>
+  </dialog>
+
+  <script>
+    const sourceDialog = document.querySelector("#source-dialog");
+    const sourceDialogTitle = document.querySelector("#source-dialog-title");
+    const sourceDialogStatus = document.querySelector("#source-dialog-status");
+    const sourceDialogContent = document.querySelector("#source-dialog-content");
+    const sourceDialogLink = document.querySelector("#source-dialog-link");
+    const vscodeProjectUrl = "vscode://file//wsl.localhost/Ubuntu/home/anast/AI_Technology_Itmo/ITMOv2";
+
+    document.querySelectorAll("[data-source]").forEach((link) => {
+      link.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        const source = link.dataset.source;
+        sourceDialogTitle.textContent = link.dataset.title || "Исходный файл";
+        sourceDialogStatus.textContent = "Загрузка…";
+        sourceDialogContent.textContent = "";
+        sourceDialogLink.href = `${vscodeProjectUrl}${source}`;
+        sourceDialog.showModal();
+
+        try {
+          const response = await fetch(source);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          sourceDialogContent.textContent = await response.text();
+          sourceDialogStatus.textContent = "Файл загружен из локального проекта.";
+        } catch (error) {
+          sourceDialogStatus.textContent = `Не удалось загрузить файл: ${error.message}`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
