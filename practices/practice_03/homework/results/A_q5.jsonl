@@ -1,0 +1,1 @@
+{"type":"error","timestamp":1791405641433,"sessionID":"ses_ee7eaf843ffe3md1N5ZOcUHhEe","error":{"type":"unknown","message":"Transport: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()"}}

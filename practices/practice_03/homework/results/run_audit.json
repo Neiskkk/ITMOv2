@@ -1,0 +1,94 @@
+{
+  "files": {
+    "A_q1.jsonl": {
+      "sessionID": "ses_ee80996abffey3yH6lEo1nyfia",
+      "tool_use": {
+        "read": 2,
+        "glob": 1,
+        "grep": 1
+      },
+      "final_text_events": 1
+    },
+    "A_q2.jsonl": {
+      "sessionID": "ses_ee8023113ffe9vnJo92Kyngss1",
+      "tool_use": {
+        "read": 1,
+        "glob": 1,
+        "grep": 3
+      },
+      "final_text_events": 0
+    },
+    "A_q3.jsonl": {
+      "sessionID": "ses_ee7fcff15ffemhCSb6ypI0kdjj",
+      "tool_use": {
+        "read": 1,
+        "glob": 0,
+        "grep": 3
+      },
+      "final_text_events": 1
+    },
+    "A_q4.jsonl": {
+      "sessionID": "ses_ee7f1fad9ffedikA7Alzvp0hSA",
+      "tool_use": {
+        "read": 1,
+        "glob": 1,
+        "grep": 1
+      },
+      "final_text_events": 0
+    },
+    "A_q5.jsonl": {
+      "sessionID": "ses_ee7eaf843ffe3md1N5ZOcUHhEe",
+      "tool_use": {
+        "read": 0,
+        "glob": 0,
+        "grep": 0
+      },
+      "final_text_events": 0
+    },
+    "B_q1.jsonl": {
+      "sessionID": "ses_ee806b506fferBXKZ7Nib2xzdI",
+      "tool_use": {
+        "read": 1,
+        "glob": 1,
+        "grep": 0
+      },
+      "final_text_events": 1
+    },
+    "B_q2.jsonl": {
+      "sessionID": "ses_ee8001e7fffenBJjJWxF28FP7C",
+      "tool_use": {
+        "read": 4,
+        "glob": 1,
+        "grep": 0
+      },
+      "final_text_events": 0
+    },
+    "B_q3.jsonl": {
+      "sessionID": "ses_ee7f423e6ffepi2SY73uOUm22H",
+      "tool_use": {
+        "read": 0,
+        "glob": 1,
+        "grep": 1
+      },
+      "final_text_events": 1
+    },
+    "B_q4.jsonl": {
+      "sessionID": "ses_ee7ee34bbffew4vkdgKqPqSwax",
+      "tool_use": {
+        "read": 2,
+        "glob": 0,
+        "grep": 2
+      },
+      "final_text_events": 1
+    },
+    "B_q5.jsonl": {
+      "sessionID": "ses_ee7e7298bffe6p5hGqICvxjQhS",
+      "tool_use": {
+        "read": 2,
+        "glob": 1,
+        "grep": 0
+      },
+      "final_text_events": 0
+    }
+  }
+}
