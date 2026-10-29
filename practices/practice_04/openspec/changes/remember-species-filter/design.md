@@ -27,6 +27,37 @@
 Альтернативы:
 - sessionStorage вместо localStorage — отклонено: требуется межсессионное запоминание.
 
+## Взаимодействие компонентов (Mermaid)
+
+```mermaid
+sequenceDiagram
+  participant U as Пользователь
+  participant UIF as UI фильтров
+  participant Init as initializeCatalog
+  participant Set as setActiveFilter
+  participant LS as localStorage
+  participant Render as renderAnimals
+
+  %% 1) Выбор фильтра: Пользователь → UI → setActiveFilter → localStorage и renderAnimals → UI
+  U->>UIF: Выбирает фильтр (Все/Кошки/Собаки)
+  UIF->>Set: setActiveFilter(filter)
+  Set->>LS: setItem('shelter.catalog.filter', filter)
+  Set->>Render: renderAnimals(filter)
+  Render->>UIF: Обновить карточки каталога
+
+  %% 2) Загрузка страницы: initializeCatalog → localStorage → валидация → setActiveFilter → renderAnimals → UI
+  Init->>LS: getItem('shelter.catalog.filter')
+  Init->>Init: Валидация (all|cat|dog) или fallback 'all'
+  Init->>Set: setActiveFilter(validFilter)
+  Set->>Render: renderAnimals(validFilter)
+  Render->>UIF: Обновить карточки каталога
+
+  %% 3) Поиск: вызывает renderAnimals с активным фильтром, запрос не сохраняется
+  U->>UIF: Вводит поиск по имени
+  UIF->>Render: renderAnimals(activeFilter + query)
+  Note over UIF,LS: Поисковый запрос не сохраняется в localStorage
+```
+
 ## Risks / Trade-offs
 
 - Повреждённое значение в localStorage: защищено валидатором, fallback на all.
