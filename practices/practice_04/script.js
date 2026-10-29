@@ -123,9 +123,15 @@ function createAnimalCard(animal) {
 function renderAnimals(filter = "all") {
   const animalList = document.querySelector("#animal-list");
   const emptyState = document.querySelector("#empty-state");
-  const filteredAnimals = filterAnimals(animals, filter);
-  const fragment = document.createDocumentFragment();
+  const searchInput = document.querySelector("#pet-search");
+  const query = ((searchInput && searchInput.value) || "").trim().toLowerCase();
 
+  const bySpecies = filterAnimals(animals, filter);
+  const filteredAnimals = query
+    ? bySpecies.filter((animal) => animal.name.toLowerCase().includes(query))
+    : bySpecies;
+
+  const fragment = document.createDocumentFragment();
   filteredAnimals.forEach((animal) => fragment.append(createAnimalCard(animal)));
   animalList.replaceChildren(fragment);
   emptyState.hidden = filteredAnimals.length !== 0;
@@ -139,6 +145,11 @@ function setActiveFilter(filter) {
   });
 
   renderAnimals(filter);
+}
+
+function getActiveFilter() {
+  const active = document.querySelector('.filter-button[aria-pressed="true"], .filter-button.is-active');
+  return active ? active.dataset.filter : "all";
 }
 
 function openApplication(animalId) {
@@ -210,6 +221,14 @@ function initializeCatalog() {
       openApplication(button.dataset.animalId);
     }
   });
+
+  const search = document.querySelector("#pet-search");
+  if (search) {
+    search.addEventListener("input", () => {
+      const filter = getActiveFilter();
+      renderAnimals(filter);
+    });
+  }
 }
 
 // ===== Feature 2: Application form =====

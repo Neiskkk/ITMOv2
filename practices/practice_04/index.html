@@ -44,10 +44,16 @@
     <section class="pets-section" id="pets" aria-labelledby="pets-title">
       <div class="pets-heading">
         <div><h2 id="pets-title">Кого вы хотите встретить?</h2><p>Выберите вид животного или посмотрите весь каталог.</p></div>
-        <div class="filter-group" role="group" aria-label="Фильтр питомцев">
-          <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Все <span data-count="all">0</span></button>
-          <button class="filter-button" type="button" data-filter="cat" aria-pressed="false">Кошки <span data-count="cat">0</span></button>
-          <button class="filter-button" type="button" data-filter="dog" aria-pressed="false">Собаки <span data-count="dog">0</span></button>
+        <div class="catalog-controls">
+          <div class="search-field">
+            <label for="pet-search">Поиск по имени</label>
+            <input id="pet-search" name="pet-search" type="search" placeholder="Начните вводить имя" autocomplete="off">
+          </div>
+          <div class="filter-group" role="group" aria-label="Фильтр питомцев">
+            <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Все <span data-count="all">0</span></button>
+            <button class="filter-button" type="button" data-filter="cat" aria-pressed="false">Кошки <span data-count="cat">0</span></button>
+            <button class="filter-button" type="button" data-filter="dog" aria-pressed="false">Собаки <span data-count="dog">0</span></button>
+          </div>
         </div>
       </div>
       <div class="animal-grid" id="animal-list" aria-live="polite"></div>
