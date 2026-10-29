@@ -1,50 +1,134 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+
+Version change: n/a → 1.0.0
+
+Modified principles: n/a (initial adoption)
+Added principles:
+- I. Технологический стек
+- II. Доступность
+- III. Адаптивность
+- IV. Безопасность клиентской части
+- V. Спецификации до кода (UI и логика)
+- VI. Человеческое согласование спецификаций
+- VII. Проверки сценариев (основной/ошибочный/граничный/старый)
+- VIII. Диаграммы взаимодействий (Mermaid)
+- IX. Доказательства решений и проверок
+- X. Непрерывность критических функций
+
+Added sections:
+- Дополнительные ограничения
+- Рабочий процесс и контроль качества
+
+Removed sections: none
+
+Follow-up TODOs: none
+-->
+
+# Лапа помощи Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Технологический стек
+- MUST: HTML5, CSS3 и JavaScript (ES2022+) с использованием только браузерного DOM API.
+- MUST NOT: фреймворки (React/Vue/Angular и др.), сборочные runtime-зависимости, CDN-библиотеки.
+- MUST NOT: backend, базы данных и сетевые запросы; приложение работает как статический SPA на локальном HTTP-сервере.
+- MUST: все ресурсы (изображения, стили, скрипты) локальные, в UTF-8.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: минимализм повышает предсказуемость, переносимость и безопасность; снижает поверхность ошибок и упрощает проверку.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Доступность
+- MUST: полнофункциональная клавиатурная навигация; видимый фокус для интерактивных элементов.
+- MUST: семантическая разметка (header, main, section, footer и т.д.) и корректные aria-* атрибуты.
+- MUST: состояния элементов (hover, focus-visible, active, disabled) различимы не только цветом; контраст соответствует WCAG AA.
+- MUST: каждое поле формы связано с label; ошибки помечаются aria-invalid и описываются через aria-describedby.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: доступность — базовое свойство качества, расширяющее круг пользователей и снижающее регрессы.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Адаптивность
+- MUST: корректная работа при ширинах 320, 768 и 1440 px.
+- MUST: mobile-first подход; сетки на Flexbox/Grid.
+- MUST NOT: горизонтальная прокрутка.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: ключевые контрольные точки обеспечивают устойчивость интерфейса на телефонах, планшетах и десктопах.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Безопасность клиентской части
+- MUST NOT: вставка пользовательских данных через innerHTML; применять безопасные API (textContent, setAttribute и пр.).
+- MUST NOT: хранение персональных данных и поисковых запросов (localStorage, sessionStorage, cookie, URL-параметры).
+- MUST: отсутствие сетевых запросов исключает утечку данных; входные данные валидируются перед использованием.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: строгая дисциплина XSS/доверия к данным снижает риски и соответствует учебному контексту.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Спецификации до кода (UI и логика)
+- MUST: две отдельные спецификации до начала реализации — UI (макеты, состояния, адаптив) и логика (данные, события, ошибки).
+- MUST: согласованный общий контракт между UI и логикой (пропсы/данные/события), описанный явно.
+- SHOULD: спецификации содержат критерии приёмки, сценарии и диаграммы состояний ключевых компонентов.
+
+Rationale: раздельная детализация снижает недопонимание и ускоряет реализацию.
+
+### VI. Человеческое согласование спецификаций
+- MUST: реализация начинается только после ручного согласования обеих спецификаций ответственным(и).
+- MUST: ссылка на утверждённые версии спецификаций фиксируется в отчёте.
+- MUST NOT: слив/merge кода до завершения согласования.
+
+Rationale: управляемый вход уменьшает объём переделок и регрессов.
+
+### VII. Проверки сценариев (основной, ошибочный, граничный, старый)
+- MUST: покрывать основной (happy path), ошибочные, граничные и «старые» (регрессионные) сценарии.
+- MUST: фиксировать ожидаемые результаты и фактические доказательства (логи/скриншоты) для каждого сценария.
+- SHOULD: автоматизировать, где возможно; иначе — подробные шаги для ручного прогонов.
+
+Rationale: многообразие сценариев предотвращает регрессы и документирует устойчивость.
+
+### VIII. Диаграммы взаимодействий (Mermaid)
+- MUST: архитектурные взаимодействия оформляются Mermaid-диаграммами (sequence, flowchart, state, class — по контексту).
+- MUST: диаграммы экспортируются в изображения и прикладываются к отчёту; исходники .md/.mmd сохраняются в репозитории.
+
+Rationale: визуальная фиксация упрощает обсуждение, ревью и сопровождение.
+
+### IX. Доказательства решений и проверок
+- MUST: все ключевые решения и результаты проверок сопровождаются доказательствами в отчёте (ссылки, скриншоты, артефакты).
+- MUST: для спорных решений — сравнение альтернатив и причинно-следственная связь выбора.
+
+Rationale: трассируемость повышает качество и облегчает аудит.
+
+### X. Непрерывность критических функций
+- MUST NOT: изменения ломают поиск, фильтры, форму заявки и кнопку «Познакомиться».
+- MUST: на эти функции существуют регрессионные проверки перед слиянием.
+
+Rationale: защита пользовательских ключевых потоков приоритезируется над второстепенными улучшениями.
+
+## Дополнительные ограничения
+- Приложение одностраничное; навигация ведёт к существующим id секций.
+- Один h1 на страницу; прочие заголовки — h2 в секциях.
+- CSS — один файл; использовать custom properties, Flexbox/Grid; уважать prefers-reduced-motion.
+- Изображения локальные с содержательным alt; лицензии согласованы или используются заглушки.
+
+## Рабочий процесс и контроль качества
+1) Планирование: подготовка UI- и логической спецификаций + общий контракт; определение критериев приёмки.
+2) Согласование: человеческое утверждение; фиксация ссылок в отчёте.
+3) Реализация: строго в рамках согласованных спецификаций.
+4) Проверки перед релизом:
+   - node --check script.js — без ошибок;
+   - Запуск через локальный HTTP-сервер; отсутствие ошибок в консоли;
+   - Адаптив: 320/768/1440 px, без горизонтального скролла;
+   - Клавиатурная навигация и видимый фокус;
+   - Регрессии: поиск, фильтры, форма заявки, «Познакомиться».
+5) Отчёт: включает диаграммы (Mermaid → изображения), доказательства тестов, ссылки на спецификации.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- Настоящая Конституция имеет приоритет над локальными практиками и гайдлайнами.
+- Поправки:
+  - Требуют Pull Request c описанием изменений, мотивацией и, при необходимости, планом миграции.
+  - Минимум два одобрения ответственных.
+  - Обновление версии Конституции по семантическим правилам (см. ниже) и дат.
+- Версионирование (semver):
+  - MAJOR: несовместимые изменения правил/принципов; удаление или переопределение.
+  - MINOR: добавлены новые разделы/принципы или существенно расширены указания.
+  - PATCH: уточнения, редактура без изменения смысла.
+- Соответствие:
+  - Каждый PR должен явно подтверждать соблюдение Core Principles и контрольных пунктов.
+  - Периодические обзоры соответствия (не реже одного релиза), фиксация несоответствий и планов устранения.
+  - Нарушения критических требований блокируют слияние до исправления или утверждённого исключения.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-10-30 | **Last Amended**: 2026-10-30
