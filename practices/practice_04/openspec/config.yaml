@@ -30,3 +30,7 @@ schema: spec-driven
 #     archive:
 #       guidance:
 #         - Summarize the archive outcome before finishing
+
+rules:
+  design:
+    - Объясняй взаимодействие компонентов диаграммой Mermaid.
