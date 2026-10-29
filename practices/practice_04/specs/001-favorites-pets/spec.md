@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-30
 
-**Status**: Draft
+**Status**: Approved
 
 **Input**: User description: "Подготовь UI-спецификацию функции «Избранные питомцы» для проекта «Лапа помощи».
 
