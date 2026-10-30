@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 02:09:17 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "56"
+    },
+    "body": "{\"id\": 5, \"owner\": 1, \"product\": \"chair\", \"price\": 5000}"
+  },
+  "note": ""
+}

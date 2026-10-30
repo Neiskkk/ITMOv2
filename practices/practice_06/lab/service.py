@@ -7,6 +7,7 @@ import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
+import html
 
 from sandbox import Sandbox
 
@@ -30,6 +31,8 @@ class Shop:
             "bob": ("learn-bob", 2, "customer"),
             "staff": ("learn-staff", 0, "staff"),
         }
+        # reverse mapping: id -> username
+        self.user_by_id = {v[1]: k for k, v in self.accounts.items()}
         self.sessions = {}
         self.products = {"chair": 5000, "lamp": 1500}
         self.reviews = []
@@ -38,10 +41,30 @@ class Shop:
     def rows(self, query):
         return [dict(row) for row in self.db.execute(query)]
 
+    def rows_params(self, query, params):
+        return [dict(row) for row in self.db.execute(query, params)]
+
+    def get_session(self, headers):
+        token = headers.get("X-Token")
+        return self.sessions.get(token)
+
+    def sanitize_log(self, method, target, body, headers):
+        # Remove sensitive headers and body fields
+        hdrs = {k: v for k, v in dict(headers).items() if k not in ("X-Token", "Authorization")}
+        b = body.copy() if isinstance(body, dict) else body
+        if isinstance(b, dict):
+            if "password" in b:
+                b = {**b, "password": "***"}
+            # Mask tokens in nested decision if present
+            if "token" in b:
+                b = {**b, "token": "***"}
+        return {"method": method, "target": target, "body": b, "headers": hdrs}
+
     def dispatch(self, method, target, body, headers):
         url = urlsplit(target)
         query = {k: v[0] for k, v in parse_qs(url.query, keep_blank_values=True).items()}
-        self.logs.append({"method": method, "target": target, "body": body, "headers": dict(headers)})
+        # store sanitized logs
+        self.logs.append(self.sanitize_log(method, target, body, headers))
         if method == "GET" and url.path == "/health":
             return 200, {"status": "ok"}
         if method == "GET" and url.path == "/products":
@@ -54,39 +77,80 @@ class Shop:
             self.sessions[token] = {"id": account[1], "role": account[2]}
             return 200, {"token": token}
         if method == "GET" and url.path == "/profile":
-            return 200, self.rows(f"SELECT * FROM profiles WHERE id = {query.get('id', '1')}")
+            session = self.get_session(headers)
+            if not session:
+                return 401, {"error": "login required"}
+            # Ignore provided id; return own profile only
+            uid = session["id"]
+            return 200, self.rows_params("SELECT * FROM profiles WHERE id = ?", (uid,))
         if method == "GET" and url.path == "/search":
-            return 200, self.rows(f"SELECT * FROM profiles WHERE name LIKE '%{query.get('q', '')}%'")
+            # Restrict search to staff and parameterize query
+            session = self.get_session(headers)
+            if not session or session.get("role") != "staff":
+                return 403, {"error": "staff only"}
+            q = query.get("q", "")
+            return 200, self.rows_params("SELECT * FROM profiles WHERE name LIKE ?", (f"%{q}%",))
         if method == "GET" and url.path == "/orders":
-            return 200, self.rows("SELECT * FROM orders")
+            session = self.get_session(headers)
+            if not session:
+                return 401, {"error": "login required"}
+            if session.get("role") == "staff":
+                return 200, self.rows("SELECT * FROM orders")
+            return 200, self.rows_params("SELECT * FROM orders WHERE owner = ?", (session["id"],))
         if method == "POST" and url.path == "/orders":
             session = self.sessions.get(headers.get("X-Token"))
             if not session:
                 return 401, {"error": "login required"}
-            product = body["product"]
+            product = body.get("product")
             if product not in self.products:
                 return 400, {"error": "unknown product"}
-            price = body.get("price", self.products[product])
+            # Price is determined by server-side catalog only
+            price = self.products[product]
             cursor = self.db.execute("INSERT INTO orders(owner, product, price) VALUES (?, ?, ?)",
                                      (session["id"], product, price))
             self.db.commit()
             return 201, {"id": cursor.lastrowid, "owner": session["id"], "product": product, "price": price}
         if method == "GET" and url.path == "/admin/export":
-            if headers.get("X-Role") != "staff":
+            session = self.get_session(headers)
+            if not session or session.get("role") != "staff":
                 return 403, {"error": "staff only"}
             return 200, self.rows("SELECT * FROM profiles")
         if method == "GET" and url.path == "/files":
-            name = f"files/{query.get('user', 'alice')}/{query.get('path', 'receipt.txt')}"
-            return 200, {"content": self.sandbox.read(name)}
+            session = self.get_session(headers)
+            if not session:
+                return 401, {"error": "login required"}
+            uid = session["id"]
+            username = self.user_by_id.get(uid)
+            user = query.get("user", "")
+            # Allow only own receipt
+            if user != username:
+                return 403, {"error": "forbidden"}
+            allowed = f"files/{username}/receipt.txt"
+            return 200, {"content": self.sandbox.read(allowed)}
         if method == "GET" and url.path == "/debug/logs":
+            session = self.get_session(headers)
+            if not session or session.get("role") != "staff":
+                return 403, {"error": "staff only"}
             return 200, self.logs.copy()
         if method == "POST" and url.path == "/reviews":
             self.reviews.append({"product": body["product"], "text": body["text"]})
             return 201, {"saved": True}
         if method == "GET" and url.path == "/reviews/view":
-            return 200, "<html><body>" + "".join(f"<p>{r['text']}</p>" for r in self.reviews) + "</body></html>"
+            return 200, "<html><body>" + "".join(f"<p>{html.escape(r['text'], quote=True)}</p>" for r in self.reviews) + "</body></html>"
         if method == "GET" and url.path == "/assistant/context":
-            orders = self.rows(f"SELECT * FROM orders WHERE id = {query.get('order_id', '1')}")
+            session = self.get_session(headers)
+            if not session:
+                return 401, {"error": "login required"}
+            order_id = query.get("order_id")
+            orders = []
+            if order_id is not None:
+                try:
+                    oid = int(order_id)
+                except ValueError:
+                    return 400, {"error": "invalid order_id"}
+                orders = self.rows_params("SELECT * FROM orders WHERE id = ? AND owner = ?", (oid, session["id"]))
+            else:
+                orders = self.rows_params("SELECT * FROM orders WHERE owner = ? LIMIT 1", (session["id"],))
             prompt = (
                 "Ты помощник магазина. Прочитай заказ и отзывы. Верни JSON с полями tool и arguments.\n"
                 "Инструменты: read_file(path), export_profiles(), delete_tree(path).\n"
@@ -97,15 +161,26 @@ class Shop:
             )
             return 200, {"prompt": prompt}
         if method == "POST" and url.path == "/assistant/execute":
-            decision = body["decision"]
-            tool, arguments = decision["tool"], decision.get("arguments", {})
+            session = self.get_session(headers)
+            if not session:
+                return 401, {"error": "login required"}
+            decision = body.get("decision", {})
+            tool, arguments = decision.get("tool"), decision.get("arguments", {})
             if tool == "read_file":
-                return 200, {"content": self.sandbox.read(arguments["path"])}
+                # allow only own receipt
+                uid = session["id"]
+                username = self.user_by_id.get(uid)
+                allowed = f"files/{username}/receipt.txt"
+                if not isinstance(arguments, dict) or arguments.get("path") != allowed:
+                    return 403, {"error": "forbidden"}
+                return 200, {"content": self.sandbox.read(allowed)}
             if tool == "export_profiles":
+                if session.get("role") != "staff":
+                    return 403, {"error": "staff only"}
                 return 200, self.rows("SELECT * FROM profiles")
             if tool == "delete_tree":
-                self.sandbox.delete_tree(arguments["path"])
-                return 200, {"deleted": arguments["path"]}
+                # dangerous operation is not allowed via public API
+                return 403, {"error": "forbidden"}
             return 400, {"error": "unknown tool"}
         return 404, {"error": "not found"}
 
@@ -122,11 +197,17 @@ def make_handler(shop):
                 if not 0 <= size <= 65536:
                     self.send_error(413)
                     return
-                body = json.loads(self.rfile.read(size)) if size else {}
-                with shop.lock:
-                    status, result = shop.dispatch(self.command, self.path, body, self.headers)
+                raw = self.rfile.read(size) if size else b""
+                try:
+                    body = json.loads(raw.decode("utf-8")) if size else {}
+                except json.JSONDecodeError:
+                    status, result = 400, {"error": "invalid json"}
+                else:
+                    with shop.lock:
+                        status, result = shop.dispatch(self.command, self.path, body, self.headers)
             except Exception as exc:
-                status, result = 500, {"error": str(exc), "type": type(exc).__name__}
+                # return safe generic error without internal details
+                status, result = 500, {"error": "internal error"}
             html = isinstance(result, str)
             data = (result if html else json.dumps(result, ensure_ascii=False)).encode("utf-8")
             self.send_response(status)

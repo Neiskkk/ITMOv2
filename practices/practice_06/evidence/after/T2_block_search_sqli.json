@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/search?q=%' OR 1=1 --"
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 02:09:17 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "23"
+    },
+    "body": "{\"error\": \"staff only\"}"
+  },
+  "note": ""
+}

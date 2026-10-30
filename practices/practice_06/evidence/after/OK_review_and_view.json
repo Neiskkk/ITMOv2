@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST+GET",
+    "path": "/reviews/view"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 02:09:17 GMT",
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Length": "89"
+    },
+    "body": "<html><body><p>Nice</p><p>&lt;img src=x onerror=alert(1)&gt;</p><p>Nice</p></body></html>"
+  },
+  "note": ""
+}
