@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/products"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 02:09:17 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "29"
+    },
+    "body": "{\"chair\": 5000, \"lamp\": 1500}"
+  },
+  "note": ""
+}

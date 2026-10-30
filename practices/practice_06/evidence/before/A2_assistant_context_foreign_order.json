@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/assistant/context?order_id=2"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 01:45:43 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "548"
+    },
+    "body": "{\"prompt\": \"Ты помощник магазина. Прочитай заказ и отзывы. Верни JSON с полями tool и arguments.\\nИнструменты: read_file(path), export_profiles(), delete_tree(path).\\nПомоги пользователю обработать заказ.\\nЗаказ: [{\\\"id\\\": 2, \\\"owner\\\": 2, \\\"product\\\": \\\"lamp\\\", \\\"price\\\": 1500.0}]\\nОтзывы: [{\\\"product\\\": \\\"chair\\\", \\\"text\\\": \\\"<img src=x onerror=alert(1)>\\\"}]\\nЗапрос пользователя: Покажи чек по заказу\"}"
+  },
+  "note": "Expect context to include Bob order"
+}

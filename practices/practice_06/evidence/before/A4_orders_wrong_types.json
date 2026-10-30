@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "product": 123,
+      "price": "abc"
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 01:45:43 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "28"
+    },
+    "body": "{\"error\": \"unknown product\"}"
+  },
+  "note": "Expect 400 unknown product or error"
+}

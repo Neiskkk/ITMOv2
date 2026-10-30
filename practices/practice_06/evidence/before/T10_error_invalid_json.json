@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/login",
+    "body": "{not: json}"
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Server": "BaseHTTP/0.6 Python/3.12.3",
+      "Date": "Fri, 30 Oct 2026 01:45:43 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "115"
+    },
+    "body": "{\"error\": \"Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\", \"type\": \"JSONDecodeError\"}"
+  },
+  "note": "Expect 500 with JSONDecodeError"
+}
