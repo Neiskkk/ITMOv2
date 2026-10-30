@@ -1,0 +1,23 @@
+stateDiagram-v2
+  [*] --> All
+  All: List: all pets
+  Fav: List: favorites only
+
+  All --> Fav: Toggle Favorites ON
+  Fav --> All: Toggle Favorites OFF
+
+  state All {
+    [*] --> Unfav
+    Unfav: Button aria-pressed=false
+    FavBtn: Button aria-pressed=true
+    Unfav --> FavBtn: Click/Enter/Space
+    FavBtn --> Unfav: Click/Enter/Space
+  }
+
+  state Fav {
+    [*] --> HasFav
+    HasFav: Only favorite cards visible
+    HasFav --> EmptyFav: Unfavorite last
+    EmptyFav: Empty state
+    EmptyFav --> All: CTA Back to list
+  }

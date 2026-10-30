@@ -66,6 +66,197 @@ const speciesLabels = {
   dog: "собака"
 };
 
+// ===== Feature 001: Favorites (logic + UI integration) =====
+const STORAGE_KEY = "shelter.catalog.favorites";
+let favoritesSet = new Set();
+let storagePersisted = true; // reflects last successful storage sync
+let storageWarned = false; // UI one-time warning for storage unavailable
+let corruptedRecovered = false; // flag to announce recovery once
+let storageInitError = false; // flag to announce storage unavailability after first render
+
+function readFavoritesFromStorage() {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw == null) {
+      storagePersisted = true;
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+      // Parsed but not an array → treat as corrupted
+      favoritesSet = new Set();
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        storagePersisted = true;
+        corruptedRecovered = true;
+      } catch (w) {
+        storagePersisted = false;
+        storageInitError = true;
+      }
+      return [];
+    } catch (e) {
+      // corrupted JSON: reset to []
+      favoritesSet = new Set();
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        storagePersisted = true;
+        corruptedRecovered = true;
+      } catch (w) {
+        storagePersisted = false;
+        storageInitError = true;
+      }
+      return [];
+    }
+  } catch (e) {
+    // Storage unavailable
+    storagePersisted = false;
+    storageInitError = true;
+    return [];
+  }
+}
+
+function writeFavoritesToStorage(ids) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    storagePersisted = true;
+    return true;
+  } catch (e) {
+    storagePersisted = false;
+    return false;
+  }
+}
+
+function validateAndNormalizeIds(ids) {
+  if (!Array.isArray(ids)) return [];
+  const validIdsSet = new Set(animals.map((a) => a.id));
+  const next = [];
+  const seen = new Set();
+  for (const v of ids) {
+    if (typeof v !== "string") continue;
+    if (v.length === 0) continue;
+    if (!validIdsSet.has(v)) continue;
+    if (seen.has(v)) continue;
+    seen.add(v);
+    next.push(v);
+  }
+  return next;
+}
+
+function initFavorites() {
+  const rawIds = readFavoritesFromStorage();
+  const normalized = validateAndNormalizeIds(rawIds);
+  favoritesSet = new Set(normalized);
+  // corrective write when differs
+  if (storagePersisted && Array.isArray(rawIds)) {
+    if (rawIds.length !== normalized.length || rawIds.some((x, i) => normalized[i] !== x)) {
+      writeFavoritesToStorage(normalized);
+    }
+  }
+}
+
+function getFavoritesState() {
+  return {
+    favoritesIds: Array.from(favoritesSet),
+    favoritesCount: favoritesSet.size,
+    persisted: storagePersisted,
+  };
+}
+
+function isFavorite(animalId) {
+  return favoritesSet.has(animalId);
+}
+
+function addFavorite(animalId) {
+  if (!animals.some((a) => a.id === animalId)) {
+    return { ok: false, code: "UNKNOWN_ID", persisted: storagePersisted };
+  }
+  if (favoritesSet.has(animalId)) {
+    return {
+      ok: true,
+      changed: false,
+      isFavorite: true,
+      favoritesIds: Array.from(favoritesSet),
+      favoritesCount: favoritesSet.size,
+      persisted: storagePersisted,
+      code: "OK_NOOP",
+    };
+  }
+  favoritesSet.add(animalId);
+  const ids = Array.from(favoritesSet);
+  const persisted = writeFavoritesToStorage(ids);
+  return {
+    ok: true,
+    changed: true,
+    isFavorite: true,
+    favoritesIds: ids,
+    favoritesCount: ids.length,
+    persisted,
+    code: persisted ? undefined : "STORAGE_UNAVAILABLE",
+    message: persisted ? undefined : "Избранные не сохранятся после перезагрузки.",
+  };
+}
+
+function removeFavorite(animalId) {
+  if (!favoritesSet.has(animalId)) {
+    return {
+      ok: true,
+      changed: false,
+      isFavorite: false,
+      favoritesIds: Array.from(favoritesSet),
+      favoritesCount: favoritesSet.size,
+      persisted: storagePersisted,
+      code: "OK_NOOP",
+    };
+  }
+  favoritesSet.delete(animalId);
+  const ids = Array.from(favoritesSet);
+  const persisted = writeFavoritesToStorage(ids);
+  return {
+    ok: true,
+    changed: true,
+    isFavorite: false,
+    favoritesIds: ids,
+    favoritesCount: ids.length,
+    persisted,
+    code: persisted ? undefined : "STORAGE_UNAVAILABLE",
+    message: persisted ? undefined : "Избранные не сохранятся после перезагрузки.",
+  };
+}
+
+function toggleFavorite(animalId) {
+  if (!animals.some((a) => a.id === animalId)) {
+    const ids = Array.from(favoritesSet);
+    return {
+      ok: false,
+      changed: false,
+      isFavorite: false,
+      favoritesIds: ids,
+      favoritesCount: ids.length,
+      persisted: storagePersisted,
+      code: "UNKNOWN_ID",
+    };
+  }
+  const currentlyFav = favoritesSet.has(animalId);
+  const result = currentlyFav ? removeFavorite(animalId) : addFavorite(animalId);
+  return result;
+}
+
+function favoriteAriaLabel(name, fav) {
+  return fav ? `Убрать из избранного: ${name}` : `Добавить в избранное: ${name}`;
+}
+
+function announce(message) {
+  const live = document.getElementById("fav-live");
+  if (live) {
+    live.textContent = message;
+  }
+}
+
+let favoritesOnly = false; // UI-owned
+
 function filterAnimals(source, filter) {
   if (filter === "all") {
     return [...source];
@@ -110,12 +301,36 @@ function createAnimalCard(animal) {
 
   const title = createTextElement("h3", "", animal.name);
   const description = createTextElement("p", "animal-description", animal.description);
-  const button = createTextElement("button", "meet-button", `Познакомиться с ${animal.name}`);
-  button.type = "button";
-  button.dataset.action = "meet";
-  button.dataset.animalId = animal.id;
+  const meetBtn = createTextElement("button", "meet-button", `Познакомиться с ${animal.name}`);
+  meetBtn.type = "button";
+  meetBtn.dataset.action = "meet";
+  meetBtn.dataset.animalId = animal.id;
 
-  body.append(meta, title, description, button);
+  // Favorites button (UI button; safe DOM API)
+  const favBtn = document.createElement("button");
+  favBtn.type = "button";
+  favBtn.setAttribute("data-favorite-btn", "");
+  favBtn.dataset.animalId = animal.id;
+  const fav = isFavorite(animal.id);
+  favBtn.setAttribute("aria-pressed", String(fav));
+  favBtn.setAttribute("aria-label", favoriteAriaLabel(animal.name, fav));
+  // Icon + text spans for better control
+  const icon = document.createElement("span");
+  icon.className = "fav-btn__icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = fav ? "♥" : "♡";
+  const text = document.createElement("span");
+  text.className = "fav-btn__text";
+  text.textContent = fav ? "В избранном" : "В избранное";
+  favBtn.append(icon, text);
+
+  // Insert favorites button near title for prominence
+  // Create a small container for actions
+  const actions = document.createElement("div");
+  actions.className = "card-actions";
+  actions.append(favBtn);
+
+  body.append(meta, title, actions, description, meetBtn);
   article.append(image, body);
   return article;
 }
@@ -126,15 +341,49 @@ function renderAnimals(filter = "all") {
   const searchInput = document.querySelector("#pet-search");
   const query = ((searchInput && searchInput.value) || "").trim().toLowerCase();
 
-  const bySpecies = filterAnimals(animals, filter);
+  // AND-pipeline: favoritesOnly → species → search(name)
+  const base = favoritesOnly ? animals.filter((a) => favoritesSet.has(a.id)) : animals;
+  const bySpecies = filterAnimals(base, filter);
   const filteredAnimals = query
     ? bySpecies.filter((animal) => animal.name.toLowerCase().includes(query))
     : bySpecies;
 
   const fragment = document.createDocumentFragment();
   filteredAnimals.forEach((animal) => fragment.append(createAnimalCard(animal)));
+  // focus restoration anchor
+  const activeBtn = document.activeElement && document.activeElement.closest('[data-favorite-btn]');
+  const activeFavId = activeBtn ? activeBtn.dataset.animalId : null;
   animalList.replaceChildren(fragment);
-  emptyState.hidden = filteredAnimals.length !== 0;
+
+  const emptyByFavorites = favoritesOnly && filteredAnimals.length === 0;
+  const noResults = !favoritesOnly && filteredAnimals.length === 0;
+  const showEmpty = emptyByFavorites || noResults;
+  emptyState.hidden = !showEmpty;
+  const emptyCta = document.getElementById("empty-state-cta");
+  if (emptyByFavorites) {
+    emptyState.textContent = "Нет избранных";
+    if (emptyCta) {
+      emptyCta.hidden = false;
+    }
+  } else if (noResults) {
+    emptyState.textContent = "По выбранному фильтру питомцев пока нет";
+    if (emptyCta) {
+      emptyCta.hidden = true;
+    }
+  } else {
+    if (emptyCta) emptyCta.hidden = true;
+  }
+
+  // restore focus if possible
+  if (activeFavId) {
+    const nextBtn = document.querySelector(`[data-favorite-btn][data-animal-id="${activeFavId}"]`);
+    if (nextBtn) {
+      nextBtn.focus();
+    } else {
+      const toggle = document.getElementById("favorites-only-toggle");
+      (toggle || searchInput || animalList).focus?.();
+    }
+  }
 }
 
 function setActiveFilter(filter) {
@@ -202,9 +451,16 @@ function updateCounters() {
 }
 
 function initializeCatalog() {
+  initFavorites();
   populatePetSelect();
   updateCounters();
   renderAnimals();
+  // One-time init storage failure notice
+  if (!storageWarned && storageInitError) {
+    announce("Избранные не сохранятся после перезагрузки.");
+    storageWarned = true;
+    storageInitError = false;
+  }
 
   document.querySelector(".filter-group").addEventListener("click", (event) => {
     const button = event.target.closest("[data-filter]");
@@ -214,11 +470,33 @@ function initializeCatalog() {
     }
   });
 
-  document.querySelector("#animal-list").addEventListener("click", (event) => {
-    const button = event.target.closest('[data-action="meet"]');
-
-    if (button) {
-      openApplication(button.dataset.animalId);
+  const list = document.querySelector("#animal-list");
+  list.addEventListener("click", (event) => {
+    const meet = event.target.closest('[data-action="meet"]');
+    if (meet) {
+      openApplication(meet.dataset.animalId);
+      return;
+    }
+    const favBtn = event.target.closest('[data-favorite-btn]');
+    if (favBtn) {
+      const id = favBtn.dataset.animalId;
+      const result = toggleFavorite(id);
+      if (!result.ok) {
+        // do not change UI
+        return;
+      }
+      // aria updates and label announcement
+      const animal = animals.find((a) => a.id === id);
+      if (animal) {
+        announce(result.isFavorite ? `${animal.name} добавлен(а) в избранное.` : `${animal.name} удалён(а) из избранного.`);
+      }
+      if (result.persisted === false && !storageWarned && result.code === "STORAGE_UNAVAILABLE") {
+        announce("Избранные не сохранятся после перезагрузки.");
+        storageWarned = true;
+      }
+      // re-render with current active species filter
+      const filter = getActiveFilter();
+      renderAnimals(filter);
     }
   });
 
@@ -228,6 +506,31 @@ function initializeCatalog() {
       const filter = getActiveFilter();
       renderAnimals(filter);
     });
+  }
+
+  const favToggle = document.getElementById("favorites-only-toggle");
+  if (favToggle) {
+    favToggle.addEventListener("change", () => {
+      favoritesOnly = favToggle.checked;
+      const filter = getActiveFilter();
+      renderAnimals(filter);
+    });
+  }
+
+  const emptyCta = document.getElementById("empty-state-cta");
+  if (emptyCta) {
+    emptyCta.addEventListener("click", () => {
+      const favT = document.getElementById("favorites-only-toggle");
+      if (favT) favT.checked = false;
+      favoritesOnly = false;
+      const filter = getActiveFilter();
+      renderAnimals(filter);
+    });
+  }
+
+  if (corruptedRecovered) {
+    announce("Список избранных восстановлен.");
+    corruptedRecovered = false; // announce once
   }
 }
 
@@ -408,5 +711,5 @@ if (typeof document !== "undefined") {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { animals, filterAnimals, validateApplication, validateEmail, validatePhone };
+  module.exports = { animals, filterAnimals, validateApplication, validateEmail, validatePhone, initFavorites, getFavoritesState, isFavorite, addFavorite, removeFavorite, toggleFavorite };
 }

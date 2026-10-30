@@ -375,6 +375,10 @@ h2 {
   text-align: center;
 }
 
+#empty-state-cta {
+  margin-top: 0.75rem;
+}
+
 .help { background: var(--yellow); }
 
 .help-list {
@@ -503,4 +507,61 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+/* Visually hidden utility for aria-live regions */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+[data-favorite-btn] {
+  min-height: 44px; /* touch target */
+  min-width: 44px;
+  padding: 0.4rem 0.6rem;
+  color: var(--ink);
+  background: #e8efe9;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+[data-favorite-btn][aria-pressed="true"] {
+  color: var(--white);
+  background: var(--blue);
+}
+
+[data-favorite-btn]:hover,
+[data-favorite-btn]:focus-visible {
+  filter: brightness(0.95);
+}
+[data-favorite-btn] .fav-btn__icon {
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+[data-favorite-btn] .fav-btn__text {
+  margin-left: 0.4rem;
+}
+
+@media (max-width: 480px) {
+  [data-favorite-btn] .fav-btn__text { display: none; }
+}
+
+@media (min-width: 768px) {
+  [data-favorite-btn] .fav-btn__text { display: inline; }
 }
