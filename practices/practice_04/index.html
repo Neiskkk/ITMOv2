@@ -44,14 +44,27 @@
     <section class="pets-section" id="pets" aria-labelledby="pets-title">
       <div class="pets-heading">
         <div><h2 id="pets-title">Кого вы хотите встретить?</h2><p>Выберите вид животного или посмотрите весь каталог.</p></div>
-        <div class="filter-group" role="group" aria-label="Фильтр питомцев">
-          <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Все <span data-count="all">0</span></button>
-          <button class="filter-button" type="button" data-filter="cat" aria-pressed="false">Кошки <span data-count="cat">0</span></button>
-          <button class="filter-button" type="button" data-filter="dog" aria-pressed="false">Собаки <span data-count="dog">0</span></button>
+        <div class="catalog-controls">
+          <div class="search-field">
+            <label for="pet-search">Поиск по имени</label>
+            <input id="pet-search" name="pet-search" type="search" placeholder="Начните вводить имя" autocomplete="off">
+          </div>
+          <div class="filter-group" role="group" aria-label="Фильтр питомцев">
+            <button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">Все <span data-count="all">0</span></button>
+            <button class="filter-button" type="button" data-filter="cat" aria-pressed="false">Кошки <span data-count="cat">0</span></button>
+            <button class="filter-button" type="button" data-filter="dog" aria-pressed="false">Собаки <span data-count="dog">0</span></button>
+          </div>
+          <div class="favorites-only">
+            <label for="favorites-only-toggle">
+              <input id="favorites-only-toggle" type="checkbox"> Только избранные
+            </label>
+          </div>
         </div>
       </div>
       <div class="animal-grid" id="animal-list" aria-live="polite"></div>
+      <div id="fav-live" aria-live="polite" class="visually-hidden"></div>
       <p class="empty-state" id="empty-state" hidden>По выбранному фильтру питомцев пока нет</p>
+      <button class="disabled-action" id="empty-state-cta" type="button" hidden>Вернуться к списку</button>
     </section>
 
     <section class="help content-section" id="help" aria-labelledby="help-title">

@@ -1,0 +1,46 @@
+sequenceDiagram
+  participant UI
+  participant Logic
+  participant Storage as localStorage
+  participant Render as renderAnimals
+
+  Note over UI,Logic: Pets section start
+  UI->>Logic: requestFavoritesState()
+  Logic->>Storage: getItem(shelter.catalog.favorites)
+  alt Valid JSON array
+    Storage-->>Logic: [id1,id2]
+    Logic->>Logic: parse+validate+dedupe+filterUnknown
+    Logic-->>UI: favoritesIds=[id1,id2], persisted=true
+  else Corrupted or non-array JSON
+    Storage-->>Logic: invalid
+    Logic->>Logic: set empty
+    Logic->>Storage: setItem([])
+    alt Fix write successful
+      Storage-->>Logic: ok
+      Logic-->>UI: favoritesIds=[], persisted=true, code=CORRUPTED_DATA_RECOVERED
+    else Fix write failed
+      Logic-->>UI: favoritesIds=[], persisted=false, code=CORRUPTED_DATA_RECOVERED
+    end
+  else Storage unavailable
+    Logic->>Logic: use in-memory; persisted=false
+    Logic-->>UI: favoritesIds=[], persisted=false, code=STORAGE_UNAVAILABLE
+  end
+  UI->>Render: renderAnimals(favoritesOnly+search+species)
+
+  Note over UI,Logic: Toggle favorite
+  UI->>Logic: toggleFavorite(animalId)
+  Logic->>Logic: update in-memory Set
+  Logic->>Storage: setItem(json)
+  alt Write ok
+    Storage-->>Logic: ok
+    Logic-->>UI: ok=true, isFavorite=..., persisted=true
+  else Write failed
+    Logic->>Logic: keep in-memory; persisted=false
+    Logic-->>UI: ok=true, isFavorite=..., persisted=false, code=STORAGE_UNAVAILABLE
+  end
+  UI->>Render: renderAnimals(updated filter)
+
+  Note over UI,Logic: Enable favoritesOnly
+  UI->>Logic: setFavoritesOnly(true)
+  Logic-->>UI: state updated (favoritesOnly=true)
+  UI->>Render: renderAnimals(within favorites)
