@@ -1,0 +1,454 @@
+{
+  "name": "practice-07.1-code-review",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-5.2"
+        },
+        "options": {}
+      },
+      "id": "27e1ac7d-a835-42b2-9dfd-6da198d6d1e4",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1040,
+        64
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "4WUMuS3KdyZxN8Ck",
+          "name": "VseLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "pullRequestNumber": "={{ $('Normalize PR context').first().json.pr_number }}",
+        "event": "comment",
+        "body": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "09bd4766-9056-4bea-a116-3e74c016b5a1",
+      "name": "GitHub Robot1",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1440,
+        -144
+      ],
+      "webhookId": "4392c85d-31e9-4ebd-8f4d-d556cbb8f3e0",
+      "typeVersion": 1.1,
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "issueNumber": "={{ $('Normalize PR context').first().json.pr_number }}",
+        "editFields": {
+          "labels": [
+            {
+              "label": "ReviewedByAI"
+            }
+          ]
+        }
+      },
+      "id": "b98ba372-07db-40ab-8e73-fbb3bab67175",
+      "name": "Add Label to PR1",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1664,
+        -144
+      ],
+      "webhookId": "70d2db56-965b-4f1f-817c-1fbb311320c0",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior Python developer.\n\nСделай code review ТОЛЬКО изменённых строк в diff.\nНайди:\n\t•\tбаги\n\t•\tпроблемы безопасности\n\t•\tрегрессии\n\t•\tпроблемы производительности\n\t•\tнарушения best practices\n\nДай конкретные рекомендации и примеры исправлений.\n\n{{ $json.data }}",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "d25751c0-74e2-413b-9aa4-1f4e8dafce16",
+      "name": "Code Review Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1072,
+        -144
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7e64a70b-295f-4f4f-b0df-d5f94dfb9d8c",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "opened",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        304,
+        -144
+      ],
+      "id": "f54fcf4e-98d5-4f26-8ca9-aecca372643c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "events": [
+          "pull_request"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -144
+      ],
+      "id": "69c1f467-38ed-4379-89c0-689f5ed012d4",
+      "name": "PR Trigger1",
+      "webhookId": "4d3daf68-4726-4d6a-927c-6daeb35c25c3",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repo_full_name }}/pulls/{{ $json.pr_number }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3.diff"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d3cd4ee-8ed0-4d10-a561-49343e0c3461",
+      "name": "Get file's PR info",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        816,
+        -144
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7pVWxeCzeQnLlCGy",
+          "name": "GitHub Bearer Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "events": [
+          "issue_comment"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        224
+      ],
+      "id": "8763c1ba-dfad-4d26-be5f-bc8e0c166e00",
+      "name": "PR Comment Trigger",
+      "webhookId": "603d432f-6452-4e1c-8c01-a8ad1e528f0e",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "e0ff7bec-d95a-4a1f-91f1-5508b4fcbb74",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "created",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "be857071-d097-410c-8b68-baa6cfa0b4a7",
+              "leftValue": "={{ $json.body.comment.body.trim() }}",
+              "rightValue": "/make_ai_review",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        320,
+        224
+      ],
+      "id": "499d7024-e878-4f88-a038-efeaccb47430",
+      "name": "If make_ai_review"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "519b33ae-b69a-4b5c-a94f-d115a895e435",
+              "name": "repo_full_name",
+              "value": "={{ $json.body.issue ? $json.body.repository.full_name : $json.body.pull_request.base.repo.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "e2d7fe77-c21d-425c-a5d5-1259631a1b36",
+              "name": "pr_number",
+              "value": "={{ $json.body.issue ? $json.body.issue.number : $json.body.number }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "34781cc1-8942-43ce-9984-69905bee2adf",
+      "name": "Normalize PR context"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Code Review Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Robot1": {
+      "main": [
+        [
+          {
+            "node": "Add Label to PR1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Review Agent1": {
+      "main": [
+        [
+          {
+            "node": "GitHub Robot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Normalize PR context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR Trigger1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get file's PR info": {
+      "main": [
+        [
+          {
+            "node": "Code Review Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR Comment Trigger": {
+      "main": [
+        [
+          {
+            "node": "If make_ai_review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize PR context": {
+      "main": [
+        [
+          {
+            "node": "Get file's PR info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If make_ai_review": {
+      "main": [
+        [
+          {
+            "node": "Normalize PR context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c789ac98-e872-4462-885c-9a5977c52f91",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "68dbbb4e8fa686c3fd4e9982ade6836edb66976f207553e7ac22df961581c78c"
+  },
+  "nodeGroups": [],
+  "id": "7vPSzy0YJdlmtVI0",
+  "tags": []
+}
