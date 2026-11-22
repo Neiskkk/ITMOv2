@@ -1,0 +1,726 @@
+{
+  "name": "7.2 - Классификация Issues",
+  "nodes": [
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "events": [
+          "issues"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -144
+      ],
+      "id": "e4ad9d1c-5dcd-488c-bf50-f736db30662b",
+      "name": "Github Trigger",
+      "webhookId": "171b265d-0997-4041-b5d7-3a986584c734",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "ac83cf0d-bf07-488b-a9c2-30c4f727e770",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "opened",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        -192,
+        -144
+      ],
+      "id": "fc8bbfb6-7f23-4ab4-bf49-fcd6ac4c5bc7",
+      "name": "If issue opened"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.confidence >= 0.8 ? $json.type : \"unknown\" }}",
+                    "rightValue": "=bug",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0936131b-ee0d-47a5-a046-4bfe6dc35c56"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "bug"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "7ea01a66-0319-466a-8f76-58a71489df00",
+                    "leftValue": "={{ $json.confidence >= 0.8 ? $json.type : \"unknown\" }}",
+                    "rightValue": "task",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "task"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "13b47abe-1354-4950-b3d1-d83ce3e5f821",
+                    "leftValue": "={{ $json.confidence >= 0.8 ? $json.type : \"unknown\" }}",
+                    "rightValue": "feature",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "feature"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        560,
+        -192
+      ],
+      "id": "3078e15f-ea90-4282-a607-bfb6f58f3368",
+      "name": "Route Issue"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/labels' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"feature\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        -144
+      ],
+      "id": "da30cc38-6bad-488e-9b26-97a787d34610",
+      "name": "Add label feature",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/labels' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"bug\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        -384
+      ],
+      "id": "0400e087-642b-4e47-b1f1-11c0392d95a9",
+      "name": "Add label bug",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/labels' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"task\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        -256
+      ],
+      "id": "4807dbd9-c459-4163-8b03-b361ee51c5a6",
+      "name": "Add label task",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/labels' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"needs-triage\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        -16
+      ],
+      "id": "8a3ca5cd-7fb8-49db-b0f0-d5a6fe8a3d6d",
+      "name": "Add label needs-triage",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "GxOk3xjVbXtMhUOv",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GxOk3xjVbXtMhUOv",
+          "cachedResultName": "7.2 — Классификатор Issues — Sub-workflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.body.issue.title }}",
+            "body": "={{ $json.body.issue.body ?? \"\" }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        -160
+      ],
+      "id": "e96c70a9-1ba8-4b29-a589-009393853e3c",
+      "name": "Call Issue classifier"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "366c4163-1228-42d2-98dd-8f236615ae14",
+              "leftValue": "={{ $('Github Trigger').first().json.body.issue.author_association }}",
+              "rightValue": "NONE",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1040,
+        -224
+      ],
+      "id": "0713865d-ea79-42ad-bdd7-c7df19896b8e",
+      "name": "If new contributor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/labels' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"first-time-contributor\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1264,
+        -336
+      ],
+      "id": "978e0c1e-c093-495f-b2e1-3d6323ea0771",
+      "name": "Add label first-time-contributor",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Github Trigger').first().json.body.issue.url + '/comments' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{   \"Привет, @\" +   $('Github Trigger').first().json.body.issue.user.login +   \"! Спасибо за обращение и добро пожаловать в проект!\\n\\n\" +   \"Правила участия: https://github.com/Neiskkk/ITMOv2/blob/2026-kolesnik-anastasia-practice-07-2/CONTRIBUTING.md\" }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1424,
+        -336
+      ],
+      "id": "3c00d943-0008-46f8-9373-5557e6088863",
+      "name": "Welcome new contributor",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "SdHsPanv5Itj9x3T",
+          "mode": "list",
+          "cachedResultName": "processed_issues",
+          "cachedResultUrl": "/projects/ggxxSPEJziR2sQNy/datatables/SdHsPanv5Itj9x3T"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "issue_id",
+              "keyValue": "={{ $json.body.issue.id.toString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        -160
+      ],
+      "id": "f18314b5-d231-4dab-a104-16ac989169e0",
+      "name": "Continue if issue unprocessed"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "SdHsPanv5Itj9x3T",
+          "mode": "list",
+          "cachedResultName": "processed_issues",
+          "cachedResultUrl": "/projects/ggxxSPEJziR2sQNy/datatables/SdHsPanv5Itj9x3T"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "issue_id",
+              "keyValue": "={{ $('Github Trigger').first().json.body.issue.id.toString() }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "issue_id": "={{ $('Github Trigger').first().json.body.issue.id.toString() }}",
+            "author": "={{ $('Github Trigger').first().json.body.issue.user.login }}",
+            "created_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "issue_id",
+              "displayName": "issue_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "author",
+              "displayName": "author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1648,
+        -272
+      ],
+      "id": "91f8b128-20b8-4a91-8f69-3bd74e8a2bc4",
+      "name": "Save processed issue"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Github Trigger": {
+      "main": [
+        [
+          {
+            "node": "If issue opened",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If issue opened": {
+      "main": [
+        [
+          {
+            "node": "Continue if issue unprocessed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Issue": {
+      "main": [
+        [
+          {
+            "node": "Add label bug",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label feature",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label needs-triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Issue classifier": {
+      "main": [
+        [
+          {
+            "node": "Route Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label bug": {
+      "main": [
+        [
+          {
+            "node": "If new contributor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label task": {
+      "main": [
+        [
+          {
+            "node": "If new contributor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label feature": {
+      "main": [
+        [
+          {
+            "node": "If new contributor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If new contributor": {
+      "main": [
+        [
+          {
+            "node": "Add label first-time-contributor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save processed issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label first-time-contributor": {
+      "main": [
+        [
+          {
+            "node": "Welcome new contributor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Continue if issue unprocessed": {
+      "main": [
+        [
+          {
+            "node": "Call Issue classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome new contributor": {
+      "main": [
+        [
+          {
+            "node": "Save processed issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label needs-triage": {
+      "main": [
+        [
+          {
+            "node": "Save processed issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d4a8f956-7805-48b2-939b-0fd38b635266",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "68dbbb4e8fa686c3fd4e9982ade6836edb66976f207553e7ac22df961581c78c"
+  },
+  "nodeGroups": [],
+  "id": "mX2xSzpoPOoDHCCs",
+  "tags": []
+}
