@@ -1,0 +1,872 @@
+{
+  "name": "practice-07.1-code-review",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "review",
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "pullRequestNumber": "={{ $('Normalize PR context').first().json.pr_number }}",
+        "event": "comment",
+        "body": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "09bd4766-9056-4bea-a116-3e74c016b5a1",
+      "name": "GitHub Robot1",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1680,
+        144
+      ],
+      "webhookId": "4392c85d-31e9-4ebd-8f4d-d556cbb8f3e0",
+      "typeVersion": 1.1,
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "issueNumber": "={{ $('Normalize PR context').first().json.pr_number }}",
+        "editFields": {
+          "labels": [
+            {
+              "label": "ReviewedByAI"
+            }
+          ]
+        }
+      },
+      "id": "b98ba372-07db-40ab-8e73-fbb3bab67175",
+      "name": "Add Label to PR1",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        2016,
+        -144
+      ],
+      "webhookId": "70d2db56-965b-4f1f-817c-1fbb311320c0",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ты - senior-разработчик и выполняешь code review одного блока изменений.\n\nФайл: {{ $json.path }}\nСтрока: {{ $json.line }}\nСторона diff: {{ $json.side }}\n\nПроверь только этот блок:\n- баги и регрессии;\n- проблемы безопасности;\n- проблемы производительности;\n- нарушения best practices.\n\nОбязательно верни один короткий точечный комментарий на русском языке.\n\nЕсли найдена проблема:\n- объясни её;\n- предложи конкретное исправление.\n\nЕсли проблем нет, кратко напиши, что блок выглядит корректно.\n\nВерни только текст комментария в Markdown.\nНе возвращай JSON, номер строки, путь файла или тройные обратные кавычки.\n\nБлок изменений:\n\n{{ $json.diff_block }}",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "d25751c0-74e2-413b-9aa4-1f4e8dafce16",
+      "name": "Code Review Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1296,
+        -144
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7e64a70b-295f-4f4f-b0df-d5f94dfb9d8c",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "opened",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        128,
+        -128
+      ],
+      "id": "f54fcf4e-98d5-4f26-8ca9-aecca372643c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "events": [
+          "pull_request"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -128
+      ],
+      "id": "69c1f467-38ed-4379-89c0-689f5ed012d4",
+      "name": "PR Trigger1",
+      "webhookId": "4d3daf68-4726-4d6a-927c-6daeb35c25c3",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.repo_full_name }}/pulls/{{ $json.pr_number }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3.diff"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d3cd4ee-8ed0-4d10-a561-49343e0c3461",
+      "name": "Get file's PR info",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        720,
+        -144
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7pVWxeCzeQnLlCGy",
+          "name": "GitHub Bearer Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "Neiskkk",
+          "mode": "list",
+          "cachedResultName": "Neiskkk",
+          "cachedResultUrl": "https://github.com/Neiskkk"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "ITMOv2",
+          "mode": "list",
+          "cachedResultName": "ITMOv2",
+          "cachedResultUrl": "https://github.com/Neiskkk/ITMOv2"
+        },
+        "events": [
+          "issue_comment"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "8763c1ba-dfad-4d26-be5f-bc8e0c166e00",
+      "name": "PR Comment Trigger",
+      "webhookId": "603d432f-6452-4e1c-8c01-a8ad1e528f0e",
+      "credentials": {
+        "githubApi": {
+          "id": "VMJ80RsZERodV8si",
+          "name": "GitHub Neiskkk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "e0ff7bec-d95a-4a1f-91f1-5508b4fcbb74",
+              "leftValue": "={{ $json.body.action }}",
+              "rightValue": "created",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "be857071-d097-410c-8b68-baa6cfa0b4a7",
+              "leftValue": "={{ $json.body.comment.body.trim() }}",
+              "rightValue": "/make_ai_review",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        128,
+        32
+      ],
+      "id": "499d7024-e878-4f88-a038-efeaccb47430",
+      "name": "If make_ai_review"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "519b33ae-b69a-4b5c-a94f-d115a895e435",
+              "name": "repo_full_name",
+              "value": "={{ $json.body.issue ? $json.body.repository.full_name : $json.body.pull_request.base.repo.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "e2d7fe77-c21d-425c-a5d5-1259631a1b36",
+              "name": "pr_number",
+              "value": "={{ $json.body.issue ? $json.body.issue.number : $json.body.number }}",
+              "type": "number"
+            },
+            {
+              "id": "7c176cdc-e741-4683-9c90-d7d75a7ee647",
+              "name": "command",
+              "value": "={{ $json.body.comment ? $json.body.comment.body.trim() : 'auto' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "34781cc1-8942-43ce-9984-69905bee2adf",
+      "name": "Normalize PR context"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "4135eb6b-f8c3-481b-ba82-217c238ea0cb",
+              "leftValue": "={{ $json.body.action === 'created' && $json.body.comment?.body?.trim() === '/make_other_ai_review' }}",
+              "rightValue": "created",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        128,
+        224
+      ],
+      "id": "6ea9a0a4-d564-482c-abf7-aa89744341db",
+      "name": "If make_other_ai_review"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "aabda213-475a-4f3e-84f8-1245063e3485",
+              "leftValue": "={{ $('Normalize PR context').first().json.command }}",
+              "rightValue": "/make_other_ai_review",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1040,
+        -144
+      ],
+      "id": "605b1700-df14-4c26-9e53-3e830dade6a8",
+      "name": "If use other model"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ты — senior-разработчик и выполняешь code review одного блока изменений.\n\nФайл: {{ $json.path }}\nСтрока: {{ $json.line }}\nСторона diff: {{ $json.side }}\n\nПроверь только этот блок:\n- баги и регрессии;\n- проблемы безопасности;\n- проблемы производительности;\n- нарушения best practices.\n\nОбязательно верни один короткий точечный комментарий на русском языке.\n\nЕсли найдена проблема:\n- объясни её;\n- предложи конкретное исправление.\n\nЕсли проблем нет, кратко напиши, что блок выглядит корректно.\n\nВерни только текст комментария в Markdown.\nНе возвращай JSON, номер строки, путь файла или тройные обратные кавычки.\n\nБлок изменений:\n\n{{ $json.diff_block }}",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "eacbb817-d688-403f-a0a7-39d3aa631d45",
+      "name": "Code Review Agent Other",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1296,
+        -448
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "anthropic/claude-sonnet-4.6",
+          "mode": "list",
+          "cachedResultName": "anthropic/claude-sonnet-4.6"
+        },
+        "options": {}
+      },
+      "id": "2a5f6284-78d8-48e4-8b5c-f815717556c4",
+      "name": "Other Model Claude Sonnet 4.6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1296,
+        -272
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "4WUMuS3KdyZxN8Ck",
+          "name": "VseLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-5.2"
+        },
+        "options": {}
+      },
+      "id": "27e1ac7d-a835-42b2-9dfd-6da198d6d1e4",
+      "name": "Main Model GPT-5.2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1296,
+        48
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "4WUMuS3KdyZxN8Ck",
+          "name": "VseLLM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "lkfbX0Tk92bzo5Zd",
+          "mode": "list",
+          "cachedResultName": "reviewed_pull_requests",
+          "cachedResultUrl": "/projects/ggxxSPEJziR2sQNy/datatables/lkfbX0Tk92bzo5Zd"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "review_key": "={{ $('Normalize PR context').first().json.repo_full_name + '#' + $('Normalize PR context').first().json.pr_number + '#' + $('Normalize PR context').first().json.command }}",
+            "pr_id": "={{ $('Normalize PR context').first().json.repo_full_name + '#' + $('Normalize PR context').first().json.pr_number }}",
+            "repository": "={{ $('Normalize PR context').first().json.repo_full_name }}",
+            "pr_number": "={{ $('Normalize PR context').first().json.pr_number }}",
+            "command": "={{ $('Normalize PR context').first().json.command }}",
+            "model": "={{ $('Normalize PR context').first().json.command === '/make_other_ai_review' ? 'anthropic/claude-sonnet-4.6' : 'openai/gpt-5.2' }}",
+            "reviewed_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "review_key",
+              "displayName": "review_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "pr_id",
+              "displayName": "pr_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "repository",
+              "displayName": "repository",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "pr_number",
+              "displayName": "pr_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "command",
+              "displayName": "command",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "model",
+              "displayName": "model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "reviewed_at",
+              "displayName": "reviewed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        -144
+      ],
+      "id": "e99025db-2f9d-4708-95e8-8b786f0387c4",
+      "name": "Save reviewed PR"
+    },
+    {
+      "parameters": {
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "lkfbX0Tk92bzo5Zd",
+          "mode": "list",
+          "cachedResultName": "reviewed_pull_requests",
+          "cachedResultUrl": "/projects/ggxxSPEJziR2sQNy/datatables/lkfbX0Tk92bzo5Zd"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "review_key",
+              "keyValue": "={{ $json.body.repository.full_name + '#' + $json.body.issue.number + '#/make_ai_review' }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        96
+      ],
+      "id": "98b7e4b2-0961-4e53-81e9-4dbd6ba1f532",
+      "name": "Continue if review missing"
+    },
+    {
+      "parameters": {
+        "jsCode": "const diff = $input.first().json.data;\n\nif (typeof diff !== 'string' || !diff.trim()) {\n  throw new Error('PR diff is empty');\n}\n\nconst context = $('Normalize PR context').first().json;\nconst lines = diff.split('\\n');\nconst blocks = [];\n\nlet path = null;\nlet oldPath = null;\n\nfor (let i = 0; i < lines.length; i++) {\n  const current = lines[i];\n\n  if (current.startsWith('diff --git ')) {\n    path = null;\n    oldPath = null;\n    continue;\n  }\n\n  if (current.startsWith('--- a/')) {\n    oldPath = current.slice(6);\n    continue;\n  }\n\n  if (current.startsWith('+++ b/')) {\n    path = current.slice(6);\n    continue;\n  }\n\n  if (current === '+++ /dev/null') {\n    path = oldPath;\n    continue;\n  }\n\n  if (!current.startsWith('@@ ')) {\n    continue;\n  }\n\n  const header = current.match(\n    /^@@ -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@/\n  );\n\n  if (!header || !path) {\n    continue;\n  }\n\n  let oldLine = Number(header[1]);\n  let newLine = Number(header[2]);\n  let firstAddedLine = null;\n  let firstDeletedLine = null;\n\n  const hunk = [current];\n  let j = i + 1;\n\n  while (\n    j < lines.length &&\n    !lines[j].startsWith('@@ ') &&\n    !lines[j].startsWith('diff --git ')\n  ) {\n    const line = lines[j];\n    hunk.push(line);\n\n    if (line.startsWith('+') && !line.startsWith('+++')) {\n      if (firstAddedLine === null) {\n        firstAddedLine = newLine;\n      }\n      newLine++;\n    } else if (line.startsWith('-') && !line.startsWith('---')) {\n      if (firstDeletedLine === null) {\n        firstDeletedLine = oldLine;\n      }\n      oldLine++;\n    } else if (!line.startsWith('\\\\')) {\n      oldLine++;\n      newLine++;\n    }\n\n    j++;\n  }\n\n  const line = firstAddedLine ?? firstDeletedLine;\n\n  if (line !== null) {\n    blocks.push({\n      json: {\n        repo_full_name: context.repo_full_name,\n        pr_number: context.pr_number,\n        command: context.command,\n        path,\n        line,\n        side: firstAddedLine !== null ? 'RIGHT' : 'LEFT',\n        diff_block: hunk.join('\\n'),\n      },\n    });\n  }\n\n  i = j - 1;\n}\n\nif (blocks.length === 0) {\n  throw new Error('No changed diff blocks found');\n}\n\nreturn blocks;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -144
+      ],
+      "id": "a0a94b4e-f912-4b09-a543-2d60d98ff6fd",
+      "name": "Split diff into blocks"
+    },
+    {
+      "parameters": {
+        "jsCode": "const agentAnswers = $input.all();\nconst diffBlocks = $('Split diff into blocks').all();\n\nif (diffBlocks.length === 0) {\n  throw new Error('Diff blocks are missing');\n}\n\nif (agentAnswers.length !== diffBlocks.length) {\n  throw new Error(\n    `Expected ${diffBlocks.length} AI answers, received ${agentAnswers.length}`\n  );\n}\n\nconst comments = agentAnswers.map((answer, index) => {\n  const block = diffBlocks[index].json;\n  const body = String(answer.json.output ?? '').trim();\n\n  if (!body) {\n    throw new Error(`AI returned an empty comment for block ${index + 1}`);\n  }\n\n  return {\n    path: block.path,\n    line: Number(block.line),\n    side: block.side,\n    body,\n  };\n});\n\nreturn [\n  {\n    json: {\n      repo_full_name: diffBlocks[0].json.repo_full_name,\n      pr_number: diffBlocks[0].json.pr_number,\n      command: diffBlocks[0].json.command,\n      body: 'AI code review: точечные комментарии к изменённым блокам.',\n      event: 'COMMENT',\n      comments,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        -144
+      ],
+      "id": "b4c1b7a7-eb08-4f05-8944-4c3479a555d9",
+      "name": "Build inline review"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.github.com/repos/' + $json.repo_full_name + '/pulls/' + $json.pr_number + '/reviews' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  body: $json.body,\n  event: $json.event,\n  comments: $json.comments\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1856,
+        -144
+      ],
+      "id": "22289f2d-73cb-4cd6-9a99-abc07f539ec4",
+      "name": "Publish inline review",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7pVWxeCzeQnLlCGy",
+          "name": "GitHub Bearer Neiskkk"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GitHub Robot1": {
+      "main": [
+        []
+      ]
+    },
+    "Code Review Agent1": {
+      "main": [
+        [
+          {
+            "node": "Build inline review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Normalize PR context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR Trigger1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get file's PR info": {
+      "main": [
+        [
+          {
+            "node": "Split diff into blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR Comment Trigger": {
+      "main": [
+        [
+          {
+            "node": "If make_ai_review",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If make_other_ai_review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize PR context": {
+      "main": [
+        [
+          {
+            "node": "Get file's PR info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If make_ai_review": {
+      "main": [
+        [
+          {
+            "node": "Continue if review missing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If make_other_ai_review": {
+      "main": [
+        [
+          {
+            "node": "Normalize PR context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If use other model": {
+      "main": [
+        [
+          {
+            "node": "Code Review Agent Other",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code Review Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Review Agent Other": {
+      "main": [
+        [
+          {
+            "node": "Build inline review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Other Model Claude Sonnet 4.6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Code Review Agent Other",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Model GPT-5.2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Code Review Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Label to PR1": {
+      "main": [
+        [
+          {
+            "node": "Save reviewed PR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Continue if review missing": {
+      "main": [
+        [
+          {
+            "node": "Normalize PR context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split diff into blocks": {
+      "main": [
+        [
+          {
+            "node": "If use other model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build inline review": {
+      "main": [
+        [
+          {
+            "node": "Publish inline review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish inline review": {
+      "main": [
+        [
+          {
+            "node": "Add Label to PR1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b795873e-1d40-494a-931f-5495e99dc7ad",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "68dbbb4e8fa686c3fd4e9982ade6836edb66976f207553e7ac22df961581c78c"
+  },
+  "nodeGroups": [],
+  "id": "7vPSzy0YJdlmtVI0",
+  "tags": []
+}
