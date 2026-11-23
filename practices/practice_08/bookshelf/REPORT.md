@@ -2,6 +2,8 @@
 
 **Максимум по README — 12 баллов.** Проект находится в `practices/practice_08/bookshelf`. Из этой папки команда `npm run dev` запускает приложение, а `npm test` — все клиентские тесты. В Ubuntu (WSL) прошли 6 из 6 тестов за 7,6 секунды. [Инструкция по запуску](README.md) · [Вывод тестов в WSL](report/tests-wsl.txt)
 
+https://github.com/Neiskkk/ITMOv2/tree/2026-kolesnik-anastasia-practice-08/practices/practice_08/bookshelf
+
 ## 1. Макет или прототип с помощью AI — 3 балла
 
 
