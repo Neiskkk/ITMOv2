@@ -1,0 +1,33 @@
+
+Running 1 test using 1 worker
+
+  x  1 tests\books.spec.ts:72:1 › Ошибка API сохраняет ввод, повторная отправка показывает книгу (6.2s)
+
+
+  1) tests\books.spec.ts:72:1 › Ошибка API сохраняет ввод, повторная отправка показывает книгу ─────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Не удалось сохранить книгу')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('Не удалось сохранить книгу') with timeout 5000ms
+      - waiting for getByText('Не удалось сохранить книгу')
+
+
+      78 |   await form(page);await fill(page)
+      79 |   await page.getByLabel('Автор').press('Enter')
+    > 80 |   await expect(page.getByText('Не удалось сохранить книгу')).toBeVisible()
+         |                                                              ^
+      81 |   await expect(page.getByLabel('Название')).toHaveValue(book.title)
+      82 |   await expect(page.getByLabel('Автор')).toHaveValue(book.author)
+      83 |   await picture(page,'error')
+        at C:\Users\anast\Documents\Codex\2026-11-22\ghb\work\app\tests\books.spec.ts:80:62
+
+    Error Context: test-results\books-Ошибка-API-сохраняет-fc36f-я-отправка-показывает-книгу\error-context.md
+
+  1 failed
+    tests\books.spec.ts:72:1 › Ошибка API сохраняет ввод, повторная отправка показывает книгу ──────
